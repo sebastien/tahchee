@@ -1,0 +1,18 @@
+== Tachee Changelog
+
+Version 0.9.6:
+	- Plug-in support, user functions were moved to plugins
+	- Images and other resources are only copied when changed
+	- Rewrote the linking functions (now in the $linking module)
+	- build.py scripts takes parameter to force the build of some files
+	- added a setup.py for easier distribution
+
+Version 0.9.5:
+
+	- Better integration with HTML tidy
+	- Cheetah 2.0 support
+	- Improved error reporting
+	- Dependency tracking between templates
+	- `Plugins` directory support
+	- Enhanced documentation
+	- Experimental Kiwi markup support

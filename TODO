@@ -1,0 +1,10 @@
+For version 1.0:
+- Add "Packages" and "Font" directories
+- Get rid of makefiles
+- Put kiwi into packages by default
+- Manage the dependencies between pages and templates, and automatically update
+  state according to this
+- Properly manage HTML tidy errors
+- Add filters and configuration zone in build.py
+
+

@@ -1,0 +1,28 @@
+## This is how we create a function in Cheetah. Here, the $site object is 
+## a reference to Tahchee Site instance representing the current site. This
+## instance has a "link" method that allows to create a relative or absolute
+## link (depending on the mode - e.g. local or remote) in which the site is
+## built
+#def link(destination)
+$linking.link($page.path, $destination)
+#end def
+#def keywords
+tahchee
+#end def
+#def head
+#end def
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="fr">
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+  <title>$title</title>
+  <meta name="keywords" content="$keywords" />
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="Stylesheet" title="Normal" media="screen" type="text/css" href="$link('screen.css')" />
+  <link rel="start" title="Home" href="index.html" />
+  $head
+</head>
+<body>
+$body
+</body>
+</html>
