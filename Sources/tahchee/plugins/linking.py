@@ -6,22 +6,29 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   25-Feb-2006
-# Last mod.         :   20-Mar-2006
-# History           :
-#                       20-Mar-2006 Rewrote the link function
-#                       13-Mar-2006 Added index support
-#                       25-Feb-2006 First implementation
-# Bugs              :
-# To do             :
-
+# Last mod.         :   13-Jul-2006
+# -----------------------------------------------------------------------------
 
 import os, sys
+
+__doc__ = """
+
+"""
+
+NAME    = "linking"
+VERSION = None
+SUMMARY = "Useful functions to manage links within a site"
 
 class LinkingPlugin:
 
 	def __init__( self, site ):
 		self.site = site
-	
+
+	def name( self ): return NAME
+	def summary( self ): return SUMMARY
+	def version( self ): return VERSION
+	def doc( self ): return __doc__
+
 	def install( self, localdict ):
 		localdict["linking"] = self
 

@@ -1,46 +1,24 @@
 #!/usr/bin/python
 # Encoding: ISO-8859-1
-# vim: tw=80 ts=4 sw=4 noet
+# vim: tw=80 ts=4 sw=4 fenc=latin-1 noet
 # -----------------------------------------------------------------------------
-# Project           :   Tahchee                      <http://www.ivy.fr/tachee>
+# Project           :   Tahchee                     <http://www.ivy.fr/tahchee>
 # -----------------------------------------------------------------------------
 # Author            :   Sebastien Pierre                     <sebastien@ivy.fr>
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   29-Mar-2006
-# History           :
-#                       29-Mar-2006 Added parameters to the build.py script that
-#                       allows to force the generation of a page or a set of
-#                       pages. Minor code cleanup.
-#                       24-Mar-2006 Set mtime-based change detection by default
-#                       23-Mar-2006 Updated the isIndex method
-#                       13-Mar-2006 Bugfixes (by Simon Sapin), added filters and
-#                       indexes.
-#                       23-Feb-2006 Error generated when backslashes found
-#                       13-Feb-2006 Added dependency tracking between pages and
-#                       10-Feb-2006 Kiwi integration.
-#                       07-Feb-2006 Improved error handling, changed website
-#                       domain to URL. Better integration with HTML tidy.
-#                       Testing with Cheetah 2.0.
-#                       22-Nov-2005 Added Cheetah version check
-#                       21-Nov-2005 Other small bugfixes
-#                       18-Sep-2005 Small bug fixes
-#                       27-Jul-2005 Public release preparation
-#                       11-May-2005 Text generation support
-#                       20-Mar-2005 First implementation
-# Bugs              :
-# To do             :
-#                       - Automatic upload to destination website
+# Last mod.         :   13-Jul-2006
+# -----------------------------------------------------------------------------
 
 # Requires: Python 2.3, Cheetah, PIL and HTML tidy
 
-__version__ = "0.9.6"
+__version__ = "0.9.7"
 
 def version(): return __version__
 
-import os, sys, time, shutil, stat, pickle, sha, fnmatch, StringIO
-	
+import os, sys, time, shutil, stat, pickle, sha, fnmatch, re, StringIO
+
 try:
 	import Cheetah
 	from Cheetah.Template import Template
@@ -66,6 +44,7 @@ if not HTMLTIDY:
 
 CHANGE_CHECKSUM="sha1"
 CHANGE_DATE    ="date"
+RE_ALWAYS_REBUILD = re.compile("^\s*##\s*ALWAYS_REBUILD\s*$")
 
 #------------------------------------------------------------------------------
 #
@@ -105,7 +84,7 @@ def info( msg ):
 
 #------------------------------------------------------------------------------
 #
-# Utility functions
+#  Utility functions
 #
 #------------------------------------------------------------------------------
 
@@ -118,6 +97,45 @@ def shorten_path( path ):
 	cwd = os.getcwd()
 	if path.startswith(cwd): path = path[len(cwd) + 1:]
 	return path
+
+#------------------------------------------------------------------------------
+#
+#  Plugins Class
+#
+#------------------------------------------------------------------------------
+
+class Plugins:
+	"""A class that allows to easily manage plugins."""
+
+	@classmethod
+	def _instanciatePlugins(self, module, site=None):
+		"""Private helper function."""
+		p = []
+		for plugin_name in dir(module):
+			if not plugin_name.endswith("Plugin"): continue
+			else: p.append(getattr(module, plugin_name)(site))
+		return p
+
+	@classmethod
+	def list(self, pluginsDir=None, site=None):
+		base_plugins   = os.path.join(os.path.dirname(__file__), "plugins")
+		plugins = []
+		# Parses the plugins in the tahchee.plugins directory
+		for f in os.listdir(base_plugins):
+			if not os.path.isfile(os.path.join(base_plugins, f)) or not f.endswith(".py"): continue
+			m = None
+			try:
+				exec "import tahchee.plugins.%s as m" % (os.path.splitext(f)[0])
+				plugins.extend(self._instanciatePlugins(m, site))
+			except:
+				pass
+		# Now parses the plugins in the pluginsDir
+		if pluginsDir and os.path.exists(pluginsDir):
+			for f in os.listdir(pluginsDir):
+				if not os.path.isfile(os.path.join(pluginsDir, f)) or not f.endswith(".py"): continue
+				m = None ; exec "import %s as m" % (os.path.splitext(f)[0])
+				plugins.extend(self._instanciatePlugins(m))
+		return plugins
 
 #------------------------------------------------------------------------------
 #
@@ -168,11 +186,11 @@ class Site:
 		self._websiteURL  = websiteURL
 		self._mode        = mode
 		self.rootDir      = ensure_path(os.path.abspath(root))
-		self.pagesDir     = self.rootDir + "/Pages"
-		self.outputDir    = self.rootDir + "/Site"
-		self.templatesDir = self.rootDir + "/Templates"
-		self.fontsDir     = self.rootDir + "/Fonts"
-		self.pluginsDir   = self.rootDir + "/Plugins"
+		self.pagesDir     = os.path.join(self.rootDir, "Pages")
+		self.outputDir    = os.path.join(self.rootDir, "Site")
+		self.templatesDir = os.path.join(self.rootDir, "Templates")
+		self.fontsDir     = os.path.join(self.rootDir, "Fonts")
+		self.pluginsDir   = os.path.join(self.rootDir, "Plugins")
 		self._plugins     = []
 		self._accepts     = []
 		self._ignores     = []
@@ -188,7 +206,30 @@ class Site:
 		# the templates. These files will be copied after the templates are
 		# applied.
 		self.createdFiles = []
+		# This is a list of files that are remaining to be processed by the site
+		# buidler when applying templates
+		self._toProcess    = []
 		sys.path.append(self.rootDir)
+
+	def willProcess( self, inputPath, outputPath=None, force=False ):
+		"""Registers the given file to be processed by the SiteBuilder when
+		applying templates."""
+		inputPath  = os.path.abspath(inputPath)
+		if outputPath: outputPath = os.path.abspath(outputPath)
+		self._toProcess.append((inputPath, outputPath, force))
+	
+	def nextToProcess( self ):
+		"""Returns a triple (inputpath, outputpath, force) that indicates the
+		next file that should be processed by the builder. This is an iteration
+		method, which means that if the file is not processed and not re-added
+		using 'willProcess' it will not be processed."""
+		res = self._toProcess[0]
+		self._toProcess = self._toProcess[1:]
+		return res
+	
+	def hasToProcess( self ):
+		"""Tells if there are remaining files to be processed."""
+		return len(self._toProcess) > 0
 
 	def accepts( self, *args ):
 		"""Adds the glob and specifies that it is accepted as a file by this
@@ -239,40 +280,18 @@ class Site:
 			f.write("# Generated by Tahchee\n")
 			f.close()
 		for file_or_dir in os.listdir(self.templatesDir):
-			current_path = self.templatesDir + "/" + file_or_dir
+			current_path = os.path.join(self.templatesDir, file_or_dir)
 			if not os.path.isdir( current_path ):
 				if current_path[-5:] == ".tmpl":
-					 #templates.append(current_path)
-					 yield current_path
+					#templates.append(current_path)
+					yield current_path
 		#return templates
-
-	def _instanciatePlugins(self, module):
-		"""Private helper function."""
-		p = []
-		for plugin_name in dir(module):
-			if not plugin_name.endswith("Plugin"): continue
-			else: p.append(getattr(module, plugin_name)(self))
-		return p
 
 	def plugins( self ):
 		"""Returns a list of plugin instances that were detected for this
 		site."""
 		if self._plugins: return self._plugins
-		base_plugins   = os.path.join(os.path.dirname(__file__), "plugins")
-		plugins = []
-		# Parses the plugins in the tahchee.plugins directory
-		for f in os.listdir(base_plugins):
-			if not os.path.isfile(base_plugins + "/" + f) or not f.endswith(".py"): continue
-			m = None
-			exec "import tahchee.plugins.%s as m" % (os.path.splitext(f)[0])
-			plugins.extend(self._instanciatePlugins(m))
-		# Now parses the plugins in the pluginsDir
-		if os.path.exists(self.pluginsDir):
-			for f in os.listdir(self.pluginsDir):
-				if not os.path.isfile(self.pluginsDir+ "/" + f) or not f.endswith(".py"): continue
-				m = None ; exec "import %s as m" % (os.path.splitext(f)[0])
-				plugins.extend(self._instanciatePlugins(m))
-		self._plugins = plugins
+		self._plugins = Plugins.list(self.pluginsDir, self)
 		return self._plugins
 
 	def changeDetectionMethod( self ):
@@ -327,8 +346,8 @@ class Site:
 		"""Returns the absolute normalized path for the given path, which must
 		be relative to the current site root. When called with no argument, the
 		site root is returned."""
-		return os.path.normpath(self.root + "/" + path)
-	
+		return os.path.normpath(os.path.join(self.root, path))
+
 	def log(self,msg): log(msg)
 	def err(self,msg): err(msg)
 	def info(self,msg): info(msg)
@@ -390,12 +409,16 @@ class SiteBuilder:
 				if line.strip().startswith("#extends"):
 					template = line.strip()[len("#extends"):].strip()
 					break
+				# If the template was flagged with ALWAYS_REBUILD, then we force
+				# the build
+				if RE_ALWAYS_REBUILD.match(line):
+					return True
 			# If there was a template extended, we check if it is present in the
 			# templates directory
 			if template and template.startswith("Templates"):
-				template_path = "/".join(template.split(".")[1:])
+				template_path = apply(os.path.join, template.split(".")[1:])
 				# And if this template has changed, then this one too
-				if self.hasChanged(self.site.templatesDir + "/" + template_path + ".tmpl"):
+				if self.hasChanged(os.path.join(self.site.templatesDir, template_path + ".tmpl")):
 					template_has_changed = True
 		# There is a SHA1 mode for real checksum change detection
 		if self.site.changeDetectionMethod() == CHANGE_CHECKSUM:
@@ -405,9 +428,9 @@ class SiteBuilder:
 			chksum  = os.stat(path)[stat.ST_MTIME]
 		# Then we compare to registered checksums
 		# If the checksum has changed
-		if not self.checksums.get(self.site.sig()) or \
-		   self.checksums.get(self.site.sig()).get(path) != chksum or \
-		   template_has_changed:
+		if not self.checksums.get(self.site.sig()) \
+		or self.checksums.get(self.site.sig()).get(path) != chksum \
+		or template_has_changed:
 			# We take care of the mode
 			if not self.checksums.get(self.site.sig()):
 				self.checksums[self.site.sig()] = {}
@@ -421,21 +444,21 @@ class SiteBuilder:
 	def saveChecksums( self ):
 		"""Saves the cheksums to a file named 'site.checksums' in the site
 		root."""
-		path = self.site.root() + "/" + "site.checksums"
+		path = os.path.join(self.site.root(), "site.checksums")
 		fd = open(path, "w")
 		pickle.dump(self.checksums, fd)
 		fd.close()
-	
+
 	def loadChecksums(self):
 		"""Loads the cheksums from a file named 'site.checksums' in the site
 		root."""
-		path = self.site.root() + "/" + "site.checksums"
+		path = os.path.join(self.site.root(), "site.checksums")
 		if os.path.exists(path):
 			fd = open(path, "r")
 			res = pickle.load(fd)
 			fd.close()
 			assert type(res) == type(self.checksums)
-			self.checksums =res
+			self.checksums = res
 
 	# ------------------------------------------------------------------------
 	#
@@ -444,11 +467,12 @@ class SiteBuilder:
 	# ------------------------------------------------------------------------
 
 	def build( self, paths=None):
+		"""Builds the website, or builds specifically the given paths."""
 		log("Mode is '%s', generating in '%s'" % (self.site.mode(),
 		shorten_path(self.site.output())))
 		self.usedResources = {}
 		self.precompileTemplates()
-		self.applyTemplates(paths=paths)
+		self.applyTemplates(paths)
 		self.copyCreatedFiles()
 		self.saveChecksums()
 
@@ -460,8 +484,8 @@ class SiteBuilder:
 			filename = os.path.basename(os.path.splitext(template)[0])
 			# Templates are only compiled if they were not previouly compiled or
 			# if the changed.
-			if self.hasChanged(template) or not \
-			   os.path.exists(os.path.splitext(template)[0]+".py"):
+			if self.hasChanged(template) or \
+			not os.path.exists(os.path.splitext(template)[0]+".py"):
 				log("Precompiling template '%s'" % (shorten_path(os.path.splitext(template)[0])))
 				temp = Compiler(
 					file=template,
@@ -478,54 +502,69 @@ class SiteBuilder:
 					output.write("# Encoding: ISO-8859-1\n" + str(temp))
 					output.close()
 
-	def applyTemplates( self, basedir="", paths=None):
+	def applyTemplates( self, templatePaths=None):
 		"""Apply the templates to every page template present in the pages
 		directory."""
-		# Iterates on the directory content
-		if paths:
-			for path in paths:
+		# Iterates on the given files
+		if templatePaths:
+			for path in templatePaths:
 				path = os.path.abspath(path)
+				# If the path is not contained within the pages, it has no
+				# basedir, and we force the rebuild anyway
 				if not path.startswith(os.path.abspath(self.site.pages())):
-					err("Path must be under this site Pages directory: " + path)
+					self.site.willProcess(path, None, True)
+				# Otherwise it is a page, and we rebuild it
 				else:
-					self.processFile(path[len(self.site.pages())+1:], basedir, force=True)
+					self.site.willProcess(path, output_path,True)
+		# Otherwise we do that for the Pages
 		else:
-			for a_file in os.listdir(self.site.pages() +"/"+basedir):
-				self.processFile(a_file, basedir)
-	
+			for root, dirs, files in os.walk(os.path.join(self.site.pages())):
+				for f in files: self.site.willProcess(os.path.join(root, f))
+		# And we eventually process the pages we have to process
+		while self.site.hasToProcess():
+			input_path, output_path, force = self.site.nextToProcess()
+			# If not output path was specified and that input was within the
+			# Pages directory, then we update the output path
+			if not output_path and input_path.startswith(self.site.pages()):
+				output_path = os.path.join(self.site.output(), input_path[len(self.site.pages())+1:])
+			# We process the file
+			self.processFile( input_path, output_path, force )
+
 	def copyCreatedFiles( self ):
 		"""Copies the files created during the application of templates."""
 		map(self.processFile, self.site.createdFiles)
 	
-	def processFile( self, filepath, basedir="", force=False ):
+	def processFile( self, inputpath, outputpath, force=False ):
 		"""Processes the given file, which is relative to the pages directory.
 		If it is a .tmpl file, the template will be applied, otherwise, the file
 		is just copied.
 		
-		The given file must be given WITHING the pages directory
+		The given file must be given WITHIN the pages directory
 		"""
-		assert not os.path.abspath(filepath) == filepath, "File path must be relative to the Pages directory."+ filepath
-		ifile = os.path.normpath(self.site.pages() +"/"+basedir+"/"+filepath)
-		ofile = os.path.normpath(self.site.output() +"/"+basedir+"/"+filepath)
+		ifile = inputpath
+		ofile = outputpath
+		filename = os.path.basename(ifile)
 		# We test if the file is accepted
-		if not self.site.isAccepted(ifile):
+		if not force and not self.site.isAccepted(ifile):
 			log("Skipping '%s'" % (shorten_path(ifile)))
 			return False
+		# We ensure that it is not a directory
 		if not os.path.isdir(ifile):
 			# If there is a page template, then we simply apply it
-			if filepath[-4:]=="tmpl":
+			if filename[-4:]=="tmpl":
 				self.applyTemplate(ifile, force)
 			# If it is a resource, we simply copy it
-			elif filepath[0]!="." and ( force or self.hasChanged( ifile ) ):
+			elif force or self.hasChanged( ifile ):
 				info("Copying  '%s'" % (ofile))
+				dest_dir  = os.path.dirname(ofile)
+				if not os.path.exists(dest_dir): os.makedirs(dest_dir)
 				shutil.copyfile(ifile, ofile)
 		# If we found a directory, we recurse
 		else:
 			if not os.path.exists(ofile):
 				os.makedirs(ofile)
 				log("Creating '%s'" % (shorten_path(ofile)))
-			if basedir=="": self.applyTemplates(filepath)
-			else: self.applyTemplates(basedir+"/"+filepath)
+			self.applyTemplates(filepath)
 
 	def applyTemplate( self, template, force=False ):
 		"""Expands the given template to a file (generally an HTML or CSS
@@ -537,12 +576,12 @@ class SiteBuilder:
 		template_url        = template_localpath
 		# The template outputpath corresponds to the file that will be created
 		# after expanding the template.
-		template_outputpath = self.site.output() + "/" + template_localpath
+		template_outputpath = os.path.join(self.site.output(), template_localpath)
 		template_outputpath.replace(" ", "\ ")
 
 		# We do nothing if the template was already applied
 		if not force and not self.hasChanged( template ) \
-		   and os.path.exists(template_outputpath):
+		and os.path.exists(template_outputpath):
 			return
 
 		# And create a dictionary with the file attributes. This dictionnary
@@ -611,13 +650,13 @@ class SiteBuilder:
 					# summary  = errors[-10]
 					# print "SU???", summary
 					# warnings, errors = summary.split(",")
-					#Â warnings = int(warnings.strip().split()[0])
+					# warnings = int(warnings.strip().split()[0])
 					# errors   = int(errors.strip().split()[0])
-					#Â if errors > 0:
-					#Â 	# If there was a failure, we do not create the file
-					#Â 	os.unlink(template_outputpath)
+					# if errors > 0:
+					# 	# If there was a failure, we do not create the file
+					# 	os.unlink(template_outputpath)
 					# 	err(summary)
-					#Â else:
+					# else:
 					#	warn(summary)
 				else:
 					shutil.copy(template_outputpath+".tmp", template_outputpath)
@@ -638,8 +677,8 @@ class SiteBuilder:
 MAKEFILE_TEMPLATE = """\
 # Tahchee makefile template version %s
 PYTHON  = /usr/bin/env python
-LOCAL	= Site/Local
-REMOTE	= Site/Remote
+LOCAL   = Site/Local
+REMOTE  = Site/Remote
 
 local:
 	$(PYTHON) build.py local
@@ -693,9 +732,8 @@ if __name__ == "__main__":
 BUILD_PY_DEFAULTS = """\
 URL     = "%s"
 INDEXES = ["index.*"]
-IGNORES = [".cvs", ".CVS", ".svn", ".DS_Store"]
-ACCEPTS = []
-"""
+IGNORES = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
+ACCEPTS = []"""
 
 BASE_TMPL ="""\
 ## This is how we create a function in Cheetah. Here, the $site object is 
@@ -845,6 +883,7 @@ Links : <http://www.ivy.fr/tahchee>        Tahchee website
 
 Usage : tahchee create url [directory]          (Creates a new website)
         tahchee update [directory]              (Updates website tahchee files)
+        tahchee version                         (Displays version info)
 
         Creates/updates a tahchee projet in the current directory or in the
         indicated directory.
@@ -913,7 +952,7 @@ def run( args ):
 		write( directory + "/build.py", BUILD_PY_TEMPLATE  % (BUILD_PY_DEFAULTS
 		% (websiteurl)))
 		for subdir in "Pages Templates Site/Local Site/Remote".split():
-			path = directory + "/" + subdir
+			path = os.path.join(directory, subdir)
 			if not os.path.exists(path): os.makedirs(path)
 		write( directory + "/Templates/Base.tmpl", BASE_TMPL)
 		write( directory + "/Templates/Page.tmpl", PAGE_TMPL)
@@ -951,7 +990,21 @@ def run( args ):
 		if os.path.exists(build_py): os.unlink(build_py)
 		write(build_py , BUILD_PY_TEMPLATE  % (user_configuration))
 		print "Your project was updated."
-	
+
+	# ========================================================================
+	# UPDATE MODE
+	# ========================================================================
+	elif args[0] == "plugin" or args[0] == "plugins":
+		data = []
+		print "Available plugins:"
+		for plugin in Plugins.list():
+			data.append((plugin.name(), plugin.version() or __version__, plugin.summary()))
+		for n, v, d in data:
+			print " - %-15s %-6s %s" % (n, v, d)
+
+	elif args[0] in ("version" "--version"):
+		print "tahchee " + __version__
+
 if __name__ == "__main__":
 	args = sys.argv[1:]
 	run(args)

@@ -6,12 +6,8 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   25-Feb-2006
-# Last mod.         :   25-Feb-2006
-# History           :
-#                       25-Feb-2006 First implementation
-# Bugs              :
-# To do             :
-# Requires: PIL
+# Last mod.         :   13-Jul-2006
+# -----------------------------------------------------------------------------
 
 # This is a Kiwi-formatted plugin documentation. This allows to produce
 # automatic documentation.
@@ -28,6 +24,10 @@ to integrate into your pages. This module allows you to:
 	  pages
 
 """
+
+NAME    = "imaging"
+VERSION = None
+SUMMARY = "Image generation and processing (fonts, rounded corners)"
 
 # We try to see if the PIL is present
 try:
@@ -84,6 +84,11 @@ class ImagingPlugin:
 	def __init__( self, site ):
 		self.site = site
 	
+	def name( self ): return NAME
+	def summary( self ): return SUMMARY
+	def version( self ): return VERSION
+	def doc( self ): return __doc__
+
 	def install( self, localdict ):
 		localdict["imaging"] = self
 

@@ -6,21 +6,26 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   23-Mar-2006
-# Last mod.         :   23-Mar-2006
-# History           :
-#                       13-Mar-2006  First implementation
-# Bugs              :
-# To do             :
+# Last mod.         :   13-Jul-2006
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
 import kiwi.main as kiwi
 
+NAME    = "kiwi"
+VERSION = None
+SUMMARY = "Kiwi markup to HTML conversion functions."
+
 class KiwiPlugin:
 
 	def __init__( self, site ):
 		self.site = site
-	
+
+	def name( self ): return NAME
+	def summary( self ): return SUMMARY
+	def version( self ): return VERSION
+	def doc( self ): return __doc__
+
 	def install( self, localdict ):
 		localdict["kiwi"] = self
 	
