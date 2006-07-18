@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   13-Jul-2006
+# Last mod.         :   14-Jul-2006
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.3, Cheetah, PIL and HTML tidy
@@ -178,7 +178,7 @@ class Site:
 	the pages will be generated, and the templates directory that holds the
 	Cheetah templates used to generate the files."""
 
-	def __init__( self, websiteURL, root=os.getcwd(), mode="local", **kwargs ):
+	def __init__( self, websiteURL, root=os.getcwd(), mode="local", locals=None, **kwargs ):
 		"""Initializes this basic site object. Pages are stored under the "Pages"
 		directory, output directory is "Site", templates are stored in
 		"Templates", all in the site root directory."""
@@ -195,11 +195,12 @@ class Site:
 		self._accepts     = []
 		self._ignores     = []
 		self._indexes     = []
-		def m(k, a):
-			if kwargs.get(k): a.extend(kwargs[k])
-		m("accepts", self._accepts)
-		m("ignores", self._ignores)
-		m("indexes", self._indexes)
+		self._tidy        = HTMLTIDY
+		self._tidyuse     = True
+		self._tidyconf    = os.environ.get("TIDYCONF") or ""
+		self._tidyflags   = os.environ.get("TIDYFLAGS") or ""
+		self._processOptions(locals)
+		self._processOptions(kwargs)
 		# We insert the plugins directory into the Python modules path
 		sys.path.insert(0, self.pluginsDir)
 		# This array contains a list of files created during the generation of
@@ -210,6 +211,26 @@ class Site:
 		# buidler when applying templates
 		self._toProcess    = []
 		sys.path.append(self.rootDir)
+
+	def _processOptions( self, options ):
+		if not options: return
+		def has(k):
+			return options.get(k) or options.get(k.upper()) or ""
+		def m(k, a = None):
+			if type(a) == list:
+				if options.get(k): a.extend(options[k])
+				if options.get(k.upper()): a.extend(options[k.upper()])
+			else:
+				if options.get(k): setattr(self, a, options[k])
+				if options.get(k.upper()): setattr(self, a, options[k.upper()])
+		m("accepts", self._accepts)
+		m("ignores", self._ignores)
+		m("indexes", self._indexes)
+		m("tidyconf", "_tidyconf")
+		m("tidyflags", "_tidyflags")
+		if has("USE_TIDY").lower() == "no": self._tidyuse = False
+		else: self._tidyuse = True
+
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
@@ -620,9 +641,12 @@ class SiteBuilder:
 			os.makedirs(os.path.dirname(template_outputpath))
 
 		def generate(template, template_outputpath):
+			assert isinstance(template, Template)
 			output = open(template_outputpath, "w")
 			#try:
 			template_text = str(template)
+			if not template_text:
+				warn("Template output is empty, you may want to check your template code.")
 			output.write(template_text)
 			output.close()
 			#except Exception, e:
@@ -637,9 +661,13 @@ class SiteBuilder:
 		# post-process it
 		if os.path.splitext(template_outputpath)[1].lower() in (".html", ".htm"):
 			if generate(template, template_outputpath + ".tmp"):
-				if HTMLTIDY:
-					_in, _out, _err = os.popen3("%s %s > %s" % (
-						HTMLTIDY,
+				if self.site._tidyuse:
+					flags = ""
+					if self.site._tidyconf:  flags += " -f '%s'" % (self.site._tidyconf)
+					if self.site._tidyflags: flags += " " + self.site._tidyflags
+					_in, _out, _err = os.popen3("%s %s %s > %s" % (
+						self.site._tidy,
+						flags,
 						template_outputpath+".tmp", template_outputpath)
 					)
 					# Cut the crap out of HTML tidy output
@@ -660,7 +688,7 @@ class SiteBuilder:
 					#	warn(summary)
 				else:
 					shutil.copy(template_outputpath+".tmp", template_outputpath)
-				os.unlink(template_outputpath+".tmp")
+				#os.unlink(template_outputpath+".tmp")
 				return True
 			else:
 				return False
@@ -724,7 +752,7 @@ except:
 # Do not modify this code
 if __name__ == "__main__":
 	print "tahchee v." + version()
-	site = Site(URL, ignores=IGNORES,accepts=ACCEPTS,indexes=INDEXES)
+	site = Site(URL, locals=locals())
 	if len(sys.argv)>1 and sys.argv[1].lower()=="remote": site.setMode("remote")
 	SiteBuilder(site).build(filter(lambda x:x not in ('local','remote'),sys.argv[1:]))
 """
@@ -874,36 +902,63 @@ a img{
 
 HELP = """\
 Tahchee v.%s 
-        allows to automatically build static websites from Cheetah
-        templates. It features many useful function, such as relative or
-        absolute linking, image generation, and automated build.
 
-Links : <http://www.ivy.fr/tahchee>        Tahchee website
-        <http://www.cheetahtemplate.org>   Cheetah website
+   allows to automatically build static websites from Cheetah templates. It
+   features many useful function, such as relative or absolute linking, image
+   generation, and automated build.
 
-Usage : tahchee create url [directory]          (Creates a new website)
-        tahchee update [directory]              (Updates website tahchee files)
-        tahchee version                         (Displays version info)
+Usage:
 
-        Creates/updates a tahchee projet in the current directory or in the
-        indicated directory.
-        
-        url         the URL of your website (eg. http://www.mysite.org)
-        directory   the directory in which you want to create your project
-        
-        The directory will then hold a 'Makefile' file that you can simply
-        call with the 'make' tool.
-        The directory will also be filled with the following subdirectories:
-        
-        Templates/   where you store all your page templates
-        Pages/       your site Cheetah pages, CSS files, images, etc.
-        Site/Local/  the version of your site made for local testing
-        Site/Remote/ the version of your site made for uploading to remote site
-        Fonts/       where you put your .ttf files
-        Plugins/     drop your Python modules in here
-        
+   tahchee create URL [DIRECTORY]     (Creates a new website)
+   tahchee update [DIRECTORY]         (Updates website tahchee files)
+   tahchee plugins                    (Lists available plugins)
+   tahchee help [COMMAND]             (Displays command help)
+   tahchee version                    (Displays version info)
+
+Links:
+
+   <http://www.ivy.fr/tahchee>        Tahchee website
+   <http://www.cheetahtemplate.org>   Cheetah website
 """ % (__version__)
 
+HELP_CREATE = """\
+tahchee create URL [DIRECTORY]
+
+   Creates a new Tahchee projet in the current directory or in the
+   indicated directory.
+   
+   URL         the URL of your website (eg. http://www.mysite.org)
+   DIRECTORY   the directory in which you want to create your project
+   
+   The directory will then hold a 'Makefile' file that you can simply
+   call with the 'make' tool.will  It will also be filled with the
+   following subdirectories:
+
+   Templates/   where you store all your page templates
+   Pages/       your site Cheetah pages, CSS files, images, etc.
+   Site/Local/  the version of your site made for local testing
+   Site/Remote/ the version of your site made for uploading to remote site
+   Fonts/       where you put your .ttf files
+   Plugins/     drop your Python modules in here
+"""
+
+HELP_UPDATE = """\
+tahchee update [DIRECTORY]
+
+   Updates your Tahchee project (`build.py` file and `Makefile`) so that it
+   will work with the updated version of Tahchee.
+
+   It is a good idea to run this command on your projects each time you
+   update Tahchee.
+"""
+
+HELP_PLUGINS = """\
+tahchee plugins
+
+   Displays the list of the plugins that Tahchee found for your local project.
+   This will look both for the default Tahchee plugins, and for the ones found
+   in your project `Plugins` directory.
+"""
 #------------------------------------------------------------------------------
 #
 #  Main
@@ -981,16 +1036,19 @@ def run( args ):
 						break
 				elif user_configuration != None:
 					user_configuration += line 
-			user_configuration = user_configuration[:-1]
+			if user_configuration: user_configuration = user_configuration[:-1]
+			else: user_configuration = ""
 			f.close()
 		if not user_configuration:
-			print "Something is wrong with the build.py, we have reset it."
-			print "Please edit it afterwards."
+			print "Your build.py was regenerated. The old version was moved to 'build.old'"
 			user_configuration = BUILD_PY_DEFAULTS % ("http://www.mysite.org")
+			shutil.copy(build_py, os.path.splitext(build_py)[0] + ".old")
 		if os.path.exists(build_py): os.unlink(build_py)
 		write(build_py , BUILD_PY_TEMPLATE  % (user_configuration))
-		print "Your project was updated."
-
+		if not user_configuration:
+			print "Please edit your new build.py configuration file."
+		else:
+			print "Your project was updated."
 	# ========================================================================
 	# UPDATE MODE
 	# ========================================================================
@@ -1001,7 +1059,20 @@ def run( args ):
 			data.append((plugin.name(), plugin.version() or __version__, plugin.summary()))
 		for n, v, d in data:
 			print " - %-15s %-6s %s" % (n, v, d)
-
+	# ========================================================================
+	# HELP MODE
+	# ========================================================================
+	elif args[0] in ("help" "--help"):
+		if len(args) == 1:
+			print HELP
+		else:
+			command = args[1].lower()
+			if   command == "create": print HELP_CREATE
+			elif command == "update": print HELP_UPDATE
+			elif command == "plugin": print HELP_PLUGIN
+			elif command == "version": print __version__
+			elif command == "help": print HELP
+			else: print "Unknown command: ", command
 	elif args[0] in ("version" "--version"):
 		print "tahchee " + __version__
 
@@ -1009,5 +1080,4 @@ if __name__ == "__main__":
 	args = sys.argv[1:]
 	run(args)
 
-# EOF-Linux/ASCII-----------------------------------@RisingSun//Python//1.0//EN
-
+# EOF

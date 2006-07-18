@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   13-Jul-2006
+# Last mod.         :   14-Jul-2006
 # -----------------------------------------------------------------------------
 
 import sys ; sys.path.insert(0, "Sources")
@@ -37,7 +37,7 @@ setup(
     author      = "Sebastien Pierre", author_email = "sebastien@type-z.org",
     description = SUMMARY, long_description = DESCRIPTION,
     license     = "Revised BSD License",
-    keywords    = "web, Cheetah, automated, static, dynamic, build"
+    keywords    = "web, Cheetah, automated, static, dynamic, build,"
     url         = "http://www.ivy.fr/tahchee",
     download_url= "http://www.ivy.fr/tahchee/tahchee-%s.tar.gz" % (main.__version__) ,
     package_dir = { "": "Sources" },

@@ -12,7 +12,7 @@
 
 import os, re, time
 
-TEST_FILE  = re.compile("([A-Z][0-9]+)\-(\w+)\.py")
+TEST_FILE  = re.compile("^([A-Z][0-9]+)\-(\w+)\.py$")
 TEST_FILES = {}
 
 def do():

@@ -35,13 +35,13 @@ RESOURCES       = Resources
 DISTRIBUTION    = Distribution
 API             = $(DOCUMENTATION)/tahchee-api.html
 DISTROCONTENT   = $(DOCUMENTATION) $(SOURCES) $(SCRIPTS) $(TESTS) $(RESOURCES) \
-                  Makefile LICENSE README CHANGES
+                  Makefile CHANGES
 
 # Project files_______________________________________________________________
 
 PACKAGE         = tahchee
 MAIN            = main.py
-MODULES         = tahchee tahchee.main tahchee.plugins tahchee.plugins.linking tahchee.plugins.imaging  tahchee.plugins.markup 
+MODULES         = tahchee.main tahchee.plugins.linking tahchee.plugins.imaging  tahchee.plugins.markup 
 
 TEST_MAIN       = $(TESTS)/$(PROJECT)Test.py
 SOURCE_FILES    = $(shell find $(SOURCES) -name "*.py")

@@ -35,7 +35,7 @@ body {
 	padding-top: 10pt;
 	background: rgb(255,255,255);
 	font:  9pt/13pt "Lucida Grande",Lucida,sans-serif;
-	font:  9.5pt/12pt "Georgia",serif;
+	font:  9.5pt/12pt sans-serif;
 	color: rgb(80,80,80);
 }
 
@@ -122,8 +122,14 @@ aimg {
 	color: rgb(143, 160, 168);
 }
 
+#content ul li {
+	padding-bottom: 0.5em;
+	background-color: rgb(250,250,250);
+}
+
 #content table {
 	border:  1px solid rgb(150, 220, 238);
+	padding: 5pt;
 }
 
 #content table caption {
@@ -135,13 +141,22 @@ aimg {
 	color: rgb(22, 130, 178);
 }
 
+#content table tbody {
+}
+
+#content table tr {
+	margin: 0;
+}
+
 #content table tr td {
-	padding: 10px;
+	margin: 0;
+	padding: 0px;
+	padding-right: 5pt;
 	background-color: rgb(250,250,250);
 }
 
 #content table tr.odd td {
-	background-color: rgb(250,250,250);
+	background-color: rgb(240,240,240);
 }
 
 #content span.term {
@@ -211,7 +226,7 @@ aimg {
 <body onload="init()">
 <div
 	class="title"><h1>Tahchee Manual</h1></div><table id='meta'><tr><td class='name'>Author</td><td class='value'>Sébastien Pierre</td></tr><tr><td class='name'>Version</td><td class='value'>0.9.6</td></tr></table>
- <div id='content'><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Quick setup</h3></a><div class="level3"><p>At first, you will need a Unix-based machine, or a Windows machine with an available shell (using MinGW or Cygwin), with Python 2.2+ installed.</p><ul><li><a href="http://www.ivy.fr/tahchee">Download Tahchee</a>, and decompress the tarball </li><li>Ensure that <a href="http://www.cheetahtemplate.org">Cheetah</a> (starting from version 0.9.7) is installed </li><li>Optionnaly install the <a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> (PIL) </li><li>Optionnaly install <a href="http://www.w3.org/People/Raggett/tidy/">HTML tidy</a></li></ul><p>Once this preliminary setup is done, go into the uncompressed Tahchee directory and do</p><pre>python setup.install</pre><p>You now have the <code>tahchee</code> command available in your path, and should be ready to start using Tahchee.</p><div class='note'><div class='title'>note</div><div class='content'>
+ <div id='content'><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Quick setup</h3></a><div class="level3"><p>At first, you will need a Unix-based machine, or a Windows machine with an available shell (using MinGW or Cygwin), with Python 2.2+ installed.</p><ul><li><a href="http://www.ivy.fr/tahchee">Download Tahchee</a>, and decompress the tarball </li><li>Ensure that <a href="http://www.cheetahtemplate.org">Cheetah</a> (starting from version 0.9.7) is installed </li><li>Optionnaly install the <a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> (PIL) </li><li>Optionnaly install <a href="http://www.w3.org/People/Raggett/tidy/">HTML tidy</a></li></ul><p>Once this preliminary setup is done, go into the uncompressed Tahchee directory and do</p><pre>python setup.py install</pre><p>You now have the <code>tahchee</code> command available in your path, and should be ready to start using Tahchee.</p><div class='note'><div class='title'>note</div><div class='content'>
 You can alternatively install by copying the <code>tahchee</code> directory within the
 <code>Sources</code> directory of Tahchee within your Python <code>site-packages</code> directory,
 and running tahchee with the following command:
@@ -264,7 +279,7 @@ URL     = "www.ivy.fr/tahchee"
 INDEXES = ["index.*"]
 IGNORES = [".cvs", ".CVS", ".svn", ".DS_Store"]
 ACCEPTS = []
-# =============================================================================</pre><p>Configuration options:</p><ul><li><span class='term'>URL</span> allows you to set the main URL from which your website will be accessed. This is useful when you want to generate a website with absolute links.</li><li><span class='term'>INDEXES</span> is a set of "globs" (shell-like patterns) that tell which files should be considered as indexes. This also affects link expansion.</li><li><span class='term'>IGNORES</span> specifies a list of "globs" of files that should be ignored. These files will not be copied or processed. You can also give paths relative to the <code>Pages</code> directory.</li><li><span class='term'>ACCEPTS</span> specifies the list of "globs" that will be processed. You should leave this empty, as if you specify one "ACCEPT", then everything not accepted will be ignored.</li></ul></div><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Extending Tahchee</h3></a><div class="level3"><p>Tahchee can be very easily extended with various Python functions. At first, you can create a <code>Plugins</code> directory within your site project that will hold your Python modules. These modules will be made available to the templates and will allow you to invoke your custom functions.</p><ul><li>POSSIBILITY TO DECLARE NEW FUNCTIONS...</li></ul></div><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Some advices</h3></a><div class="level3"><p>Tahchee can become quite powerful, provided you do things with a little bit of discipline. Here is what I would advice :</p><ul><li>Spend some time thinking about your site map, and the type of pages that you want to have. </li><li>Do not write too many Templates, try to keep them minimal, and make a list of the variables names taht will be filled by Pages. </li><li>Do not hesitate to use templates for your CSS files, as it can allow, for instance, to quickly change a set of predefined colors. </li><li>Cheetah templates allow to use any Python module, so do not hesitate to add extra functionality in Python modules that you can put just inside your 'Templates' directory or anywhere in your PYTHONPATH.</li></ul><p>I hope this small documentation will help you kickstart using Tahchee, if you have questions or comments, you can contact me at <a href="mailto:&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;">&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;</a>.</p></div></div>
+# =============================================================================</pre><p>There are many configuration options available. Here is the complete list of supported options.</p><ul><li><span class='term'>URL</span> allows you to set the main URL from which your website will be accessed. This is useful when you want to generate a website with absolute links.</li><li><span class='term'>INDEXES</span> is a set of "globs" (shell-like patterns) that tell which files should be considered as indexes. This also affects link expansion.</li><li><span class='term'>IGNORES</span> specifies a list of "globs" of files that should be ignored. These files will not be copied or processed. You can also give paths relative to the <code>Pages</code> directory.</li><li><span class='term'>ACCEPTS</span> specifies the list of "globs" that will be processed. You should leave this empty, as if you specify one "ACCEPT", then everything not accepted will be ignored.</li><li><span class='term'>TIDY</span> indicates the path to the HTML tidy utility (it is autodetected otherwise).</li><li><span class='term'>USE</span>TIDY_ (takes <code>yes</code> or <code>no</code>, yes is the default), indicates if HTML tidy should be enabled or not.</li><li><span class='term'>TIDYFLAGS</span> specifies the flags that should be passed to HTML tidy. You can also use an environment variable with the same name.</li><li><span class='term'>TIDYCONF</span> specifies the configuration file that should be used by HTML tidy. You can also use an environment variable with the same name.</li></ul></div><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Extending Tahchee</h3></a><div class="level3"><p>Tahchee can be very easily extended with various Python functions. At first, you can create a <code>Plugins</code> directory within your site project that will hold your Python modules. These modules will be made available to the templates and will allow you to invoke your custom functions.</p><ul><li>POSSIBILITY TO DECLARE NEW FUNCTIONS...</li></ul></div><div class="section"><a class="link" onclick="kiwi_toggleSection(event);"><h3 class="heading">Some advices</h3></a><div class="level3"><p>Tahchee can become quite powerful, provided you do things with a little bit of discipline. Here is what I would advice :</p><ul><li>Spend some time thinking about your site map, and the type of pages that you want to have. </li><li>Do not write too many Templates, try to keep them minimal, and make a list of the variables names taht will be filled by Pages. </li><li>Do not hesitate to use templates for your CSS files, as it can allow, for instance, to quickly change a set of predefined colors. </li><li>Cheetah templates allow to use any Python module, so do not hesitate to add extra functionality in Python modules that you can put just inside your 'Templates' directory or anywhere in your PYTHONPATH.</li></ul><p>I hope this small documentation will help you kickstart using Tahchee, if you have questions or comments, you can contact me at <a href="mailto:&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;">&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;</a>.</p></div></div>
 
 </body>
 </html>

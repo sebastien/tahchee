@@ -17,7 +17,7 @@ available shell (using MinGW or Cygwin), with Python 2.2+ installed.
 Once this preliminary setup is done, go into the uncompressed Tahchee directory
 and do
 
->	python setup.install
+>	python setup.py install
 
 You now have the `tahchee` command available in your path, and should be ready
 to start using Tahchee.
@@ -207,7 +207,8 @@ These options should look like the folowing.
 >	ACCEPTS = []
 >	# =============================================================================
 
-Configuration options:
+There are many configuration options available. Here is the complete list of
+supported options.
 
 	- _URL_ allows you to set the main URL from which your website will be
 	  accessed. This is useful when you want to generate a website with absolute
@@ -223,6 +224,18 @@ Configuration options:
 	- _ACCEPTS_ specifies the list of "globs" that will be processed. You should
 	  leave this empty, as if you specify one "ACCEPT", then everything not
 	  accepted will be ignored.
+	
+	- _TIDY_ indicates the path to the HTML tidy utility (it is autodetected
+	  otherwise).
+
+	- _USE_TIDY_ (takes `yes` or `no`, yes is the default), indicates if HTML
+	  tidy should be enabled or not.
+
+	- _TIDYFLAGS_ specifies the flags that should be passed to HTML tidy. You
+	  can also use an environment variable with the same name.
+
+	- _TIDYCONF_ specifies the configuration file that should be used by HTML
+	  tidy. You can also use an environment variable with the same name.
 
 7. Extending Tahchee
 ====================
