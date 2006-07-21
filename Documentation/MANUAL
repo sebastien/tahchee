@@ -1,6 +1,6 @@
 == TAHCHEE MANUAL
 -- Author: Sébastien Pierre
--- Version: 0.9.6
+-- Version: 0.9.7
 
 
 1. Quick setup
@@ -32,7 +32,7 @@ and running tahchee with the following command:
 2. First run
 ============
 
-To test your installation, go into Tahcee `Documentation/Example` directory and
+To test your installation, go into Tahchee `Documentation/Example` directory and
 type `make`. The process should run, and output lines similar to those lines:
 
 >	[ ] Mode is 'local', generating in 'Site/Local'
@@ -149,8 +149,19 @@ following line to the top of your template:
 >	#extends Templates.Page
 >	...
 
-This will tell Tahchee that the template should be applied, wether it has
-changed or not.
+If you want to state an explicit dependency between your template and another
+file, simply put its absolute path or path from the template parent dir as
+follows:
+
+>	## DEPENDS = ../../path/to/my/file.data
+>	#extends Templates.Page
+>	...
+
+These indications will allow Tahchee to decide when something should be rebuilt
+or not. In case you would like to do that from the `Makefile`, you can invoke
+the `build.py` script directly with the page you want to reuild:
+
+>	python build.py Pages/index.html.tmpl
 
 5. Using Kiwi markup
 ====================
@@ -245,7 +256,7 @@ can create a `Plugins` directory within your site project that will hold your
 Python modules. These modules will be made available to the templates and will
 allow you to invoke your custom functions.
 
-- POSSIBILITY TO DECLARE NEW FUNCTIONS...
+# - POSSIBILITY TO DECLARE NEW FUNCTIONS...
 
 7. Some advices
 ===============

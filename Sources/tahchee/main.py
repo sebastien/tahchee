@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   14-Jul-2006
+# Last mod.         :   21-Jul-2006
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.3, Cheetah, PIL and HTML tidy
@@ -45,6 +45,7 @@ if not HTMLTIDY:
 CHANGE_CHECKSUM="sha1"
 CHANGE_DATE    ="date"
 RE_ALWAYS_REBUILD = re.compile("^\s*##\s*ALWAYS_REBUILD\s*$")
+RE_DEPENDS     = re.compile("^\s*##\s*DEPENDS\s*=(.+)$")
 
 #------------------------------------------------------------------------------
 #
@@ -231,7 +232,6 @@ class Site:
 		if has("USE_TIDY").lower() == "no": self._tidyuse = False
 		else: self._tidyuse = True
 
-
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
 		applying templates."""
@@ -411,7 +411,7 @@ class SiteBuilder:
 		moving the website directory will cause a rebuild."""
 		# Maybe we already know if the path has changed
 		res  = self.changed.get(path) 
-		if res != None:
+		if not path.endswith(".tmpl") and res != None:
 			return res
 		path = os.path.abspath(path)
 		data = None
@@ -427,13 +427,24 @@ class SiteBuilder:
 			# If so, we look for the extends defintion
 			template = None
 			for line in data.split("\n"):
-				if line.strip().startswith("#extends"):
+				line = line.strip()
+				if line and not line.startswith("##") and not line.startswith("#extends"): break
+				if line.startswith("#extends"):
 					template = line.strip()[len("#extends"):].strip()
-					break
 				# If the template was flagged with ALWAYS_REBUILD, then we force
 				# the build
 				if RE_ALWAYS_REBUILD.match(line):
 					return True
+				depends = RE_DEPENDS.match(line)
+				if depends:
+					dep_path = depends.group(1).strip()
+					dep_path = os.path.expanduser(dep_path)
+					dep_abs_path = os.path.abspath(dep_path)
+					if dep_abs_path != dep_path:
+						dep_abs_path = os.path.abspath(os.path.dirname(path) + "/" + dep_path)
+					dep_path = dep_abs_path
+					if self.hasChanged(dep_path):
+						return True
 			# If there was a template extended, we check if it is present in the
 			# templates directory
 			if template and template.startswith("Templates"):
@@ -536,7 +547,7 @@ class SiteBuilder:
 					self.site.willProcess(path, None, True)
 				# Otherwise it is a page, and we rebuild it
 				else:
-					self.site.willProcess(path, output_path,True)
+					self.site.willProcess(path, None ,True)
 		# Otherwise we do that for the Pages
 		else:
 			for root, dirs, files in os.walk(os.path.join(self.site.pages())):
@@ -688,7 +699,7 @@ class SiteBuilder:
 					#	warn(summary)
 				else:
 					shutil.copy(template_outputpath+".tmp", template_outputpath)
-				#os.unlink(template_outputpath+".tmp")
+				os.unlink(template_outputpath+".tmp")
 				return True
 			else:
 				return False

@@ -25,17 +25,18 @@
 
 # Project name. Do not put spaces.
 PROJECT         = tahchee
-PROJECT_VERSION = 0.9.6
+PROJECT_VERSION = 0.9.7
 PROJECT_STATUS  = DEVELOPMENT
 
 DOCUMENTATION   = Documentation
 SOURCES         = Sources
 TESTS           = Tests
+SCRIPTS         = Scripts
 RESOURCES       = Resources
 DISTRIBUTION    = Distribution
 API             = $(DOCUMENTATION)/tahchee-api.html
 DISTROCONTENT   = $(DOCUMENTATION) $(SOURCES) $(SCRIPTS) $(TESTS) $(RESOURCES) \
-                  Makefile CHANGES
+                  Makefile CHANGES setup.py
 
 # Project files_______________________________________________________________
 
