@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os, sys
 # We add the Plugins path to the current Python path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "Plugins"))
@@ -16,6 +17,6 @@ INDEXES = ("index.*")
 # Do not modify this code
 if __name__ == "__main__":
 	print "tahchee v." + version()
-	site = Site(URL; ignores=IGNORES)
+	site = Site(URL, locals=locals())
 	if len(sys.argv)>1 and sys.argv[1].lower()=="remote": site.setMode("remote")
-	SiteBuilder(site).build()
+	SiteBuilder(site).build(filter(lambda x:x not in ('local','remote'),sys.argv[1:]))

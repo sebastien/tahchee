@@ -457,7 +457,11 @@ class SiteBuilder:
 			chksum = sha.new(data or load_data(path)).hexdigest()
 		# Default is modification time (faster)
 		else:
-			chksum  = os.stat(path)[stat.ST_MTIME]
+			if os.path.exists(path):
+				chksum  = os.stat(path)[stat.ST_MTIME]
+			else:
+				warn("Path does not exists: " + path)
+				chksum  = "0"
 		# Then we compare to registered checksums
 		# If the checksum has changed
 		if not self.checksums.get(self.site.sig()) \
@@ -672,7 +676,7 @@ class SiteBuilder:
 		# post-process it
 		if os.path.splitext(template_outputpath)[1].lower() in (".html", ".htm"):
 			if generate(template, template_outputpath + ".tmp"):
-				if self.site._tidyuse:
+				if HTMLTIDY and self.site._tidyuse:
 					flags = ""
 					if self.site._tidyconf:  flags += " -f '%s'" % (self.site._tidyconf)
 					if self.site._tidyflags: flags += " " + self.site._tidyflags

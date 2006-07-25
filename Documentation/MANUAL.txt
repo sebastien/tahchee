@@ -23,7 +23,7 @@ You now have the `tahchee` command available in your path, and should be ready
 to start using Tahchee.
 
 Note ______________________________________________________________________
-You can alternatively install by copying the `tahchee` directory within the
+You can alternatively install Tahchee by copying the `tahchee` directory within the
 `Sources` directory of Tahchee within your Python `site-packages` directory,
 and running tahchee with the following command:
 `python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"`
@@ -41,7 +41,7 @@ type `make`. The process should run, and output lines similar to those lines:
 >	[ ] Generating file 'index.html'
 
 This process will create the example HTML site in the `Site/Local` subdirectory.
-You will find the resulting HTML in there. If you want to know what other
+You will find the resulting HTML there. If you want to know what other
 options are available, type `make info`.
 
 3. How the stuff works
@@ -49,12 +49,13 @@ options are available, type `make info`.
 
 Tahchee is best described as a "website compiler". You design your site with
 _templates_, which contain the common parts between all your pages in your
-website. Once you have your templates, you write _pages_ which ''fill in the
-blanks'' in the templates. The main difference between a template and a page is
+website. Once you wrote your templates, you can start writing _pages_ which ''fill in the
+blanks'' of your templates. The main difference between a template and a page is
 that a template needs the data provided by a page to render to an HTML (or
-whatever format) file.
+whatever format) file. In other words, templates are incomplete pages, and pages
+complete templates.
 
-So, let's look at the example data, before running tahchee :
+To get a better idea of this, let's look at the example data:
 
 >	|-- Pages
 >	|   |-- index.html.tmpl
@@ -64,38 +65,38 @@ So, let's look at the example data, before running tahchee :
 >	|   |-- Base.tmpl
 >	|   `-- Page.tmpl
 
-And now after Tahchee we run (some files were omitted):
+Running `make` will populate your website project directory:
 
 >	|-- Pages
 >	|   |-- index.html.tmpl
 >	|   `-- screen.css
 >	|-- Site
->	|   `-- Local
+>	|   `-- Local                 (this is the directory created by tahchee)
 >	|       |-- index.html
 >	|       `-- screen.css
 >	|-- Templates
->	|   |-- Base.py
+>	|   |-- Base.py               (these are 'compiled' versions of your templates)
 >	|   |-- Base.tmpl
 >	|   |-- Page.py
 >	|   |-- Page.tmpl
 >	|   |-- __init__.py
 
 We see that the `Site/Local` was populated with the same content as the `Pages`
-directory, buf files ending in `.tmpl` were stripped of this exension. Before
-being stipped of their extension, the `.tmpl` files were actually processed with
+directory, excepted files ending in `.tmpl` were stripped of their extension. Before
+being stripped of their extensions, the `.tmpl` files were actually processed with
 Tahchee to generate the resulting file (which can be HTML, or any other file,
 such as CSS, PHP, etc).
 
-There are also some `.py` files in the `Templates` directory, which are actually
+There are also some `.py` files in the `Templates` directory, which are 
 the result of Cheetah compiling the templates files (`.tmpl`) in the `Templates`
-directory.
+directory into executable Python code.
 
-So basically, Tahchee works very simply:
+Tahchee works as follows:
 
-	1. It compiles the `tmpl` files in the `Templates` directory
-	2. It compiles the `tmpl` files in the `Pages` directory and copies them in
+	1. Compiles the `tmpl` files in the `Templates` directory
+	2. Compiles the `tmpl` files in the `Pages` directory and copies them in
 	the `Site/Local` subdirectory, stripping them of the `tmpl` extension
-	3. It copies other files from 'Pages' to the appropriate location in the
+	3. Copies other files from 'Pages' to the appropriate location in the
 	`Site/Local` directory.
 
 4. More about templates
@@ -119,7 +120,7 @@ set of specific templates for your site sections:
 >			|-- UserPage
 >			`-- ProjectPage
 
-If you look closer in the provided templates code, you will see that some
+If you look closer at the provided templates, you will see that some
 variables (like `$site`) are already available. Tahchee actually provides access
 to Python object representing the current page and the website as a whole, using
 the following keywords:
@@ -128,9 +129,13 @@ the following keywords:
 	- `$site` refers to the current site, and is a Site object
 
 The Page and Site objects are defined in the Tahchee Python API, available 
-with this documentation (see `Documentation/API/index.html`). For instance, the
+with this documentation (see `Documentation/tahchee-api.html`). For instance, the
 'site' object provides a `link` method that allows to link to a path or URL, and
 ensure that the link target exists.
+
+Since Tahchee 0.9.7 a plugin system allows to make additional variables
+available to templates. This allows you to write your custom Python classe and
+functions, and easily bind them to your templates.
 
 4.1 Templates and the build process
 -----------------------------------
@@ -141,6 +146,7 @@ directory) under a set of conditions:
   - They are not filtered out (see `ACCEPT` and `IGNORE` in site configuration)
   - The template or its parents were modified
   - The template was flagged with `ALWAYS_REBUILD`
+  - A file state in a `DEPENDS` directive has changed
 
 If you want a template to be *always applied*, you should simply add the
 following line to the top of your template:
@@ -150,7 +156,7 @@ following line to the top of your template:
 >	...
 
 If you want to state an explicit dependency between your template and another
-file, simply put its absolute path or path from the template parent dir as
+file, simply put its absolute path or path from the template parent directory as
 follows:
 
 >	## DEPENDS = ../../path/to/my/file.data
@@ -159,7 +165,7 @@ follows:
 
 These indications will allow Tahchee to decide when something should be rebuilt
 or not. In case you would like to do that from the `Makefile`, you can invoke
-the `build.py` script directly with the page you want to reuild:
+the `build.py` script directly with the page you want to rebuild:
 
 >	python build.py Pages/index.html.tmpl
 
@@ -203,8 +209,8 @@ gradually convert your HTML files to Kiwi markup if you need to.
 6. Configuration
 ================
 
-Tachee can be configured to meet your specific site setup. All the configuration
-should be made in the "build.py" file in your tahchee website directory, which
+Tahchee can be configured to meet your specific site setup. All the configuration
+should be made in the `build.py` file in your Tahchee website directory, which
 present you the available options.
 
 Your website `build.py` contains a set of options that you can change and edit.
@@ -251,28 +257,37 @@ supported options.
 7. Extending Tahchee
 ====================
 
-Tahchee can be very easily extended with various Python functions. At first, you
-can create a `Plugins` directory within your site project that will hold your
-Python modules. These modules will be made available to the templates and will
-allow you to invoke your custom functions.
+Tahchee can be very easily extended using its plugin system (since Tahchee
+0.9.7).
+
+Writing a plugin is very easy:
+
+ - Write your Python code independently
+ - Wrap your classes/functions into a plugin that will make particular objects
+   available to templates as variables (pretty much like the `$site` object)
+ - Publish your plugins by putting them within the `Plugins` directory
+ - Type `tahchee plugins` to make sure that your plugin was registered
+
 
 # - POSSIBILITY TO DECLARE NEW FUNCTIONS...
 
 7. Some advices
 ===============
 
-Tahchee can become quite powerful, provided you do things with a little bit of
+Tahchee can be very powerful, provided you do things with a little bit of
 discipline. Here is what I would advice :
 
 	- Spend some time thinking about your site map, and the type of pages that
 	  you want to have.
 	- Do not write too many Templates, try to keep them minimal, and make a list
 	  of the variables names taht will be filled by Pages.
-	- Do not hesitate to use templates for your CSS files, as it can allow, for
-	  instance, to quickly change a set of predefined colors.
+	- Do not hesitate to use templates for your CSS files, as it can allow
+	  (among other things) to quickly change a set of predefined colors.
 	- Cheetah templates allow to use any Python module, so do not hesitate to
 	  add extra functionality in Python modules that you can put just inside
 	  your 'Templates' directory or anywhere in your PYTHONPATH.
+	- Do not hesistate to write Plugins to provide custom functionalities
+	  (automatic generation of pages or linked data)
 
 I hope this small documentation will help you kickstart using Tahchee, if you
 have questions or comments, you can contact me at <sebastien@ivy.fr>.
