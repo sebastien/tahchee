@@ -42,7 +42,7 @@ HTMLTIDY = detectHTMLTidy()
 if not HTMLTIDY:
 	print "HTML tidy is suggested to enable HTML file clean-up and compression"
 
-CHANGE_CHECKSUM="sha1"
+CHANGE_CHECKSUM="signature"
 CHANGE_DATE    ="date"
 RE_ALWAYS_REBUILD = re.compile("^\s*##\s*ALWAYS_REBUILD\s*$")
 RE_DEPENDS     = re.compile("^\s*##\s*DEPENDS\s*=(.+)$")
@@ -135,7 +135,7 @@ class Plugins:
 			for f in os.listdir(pluginsDir):
 				if not os.path.isfile(os.path.join(pluginsDir, f)) or not f.endswith(".py"): continue
 				m = None ; exec "import %s as m" % (os.path.splitext(f)[0])
-				plugins.extend(self._instanciatePlugins(m))
+				plugins.extend(self._instanciatePlugins(m, site))
 		return plugins
 
 #------------------------------------------------------------------------------
@@ -192,6 +192,7 @@ class Site:
 		self.templatesDir = os.path.join(self.rootDir, "Templates")
 		self.fontsDir     = os.path.join(self.rootDir, "Fonts")
 		self.pluginsDir   = os.path.join(self.rootDir, "Plugins")
+		self._changeDetectionMethod = CHANGE_CHECKSUM
 		self._plugins     = []
 		self._accepts     = []
 		self._ignores     = []
@@ -230,6 +231,10 @@ class Site:
 		m("tidyconf", "_tidyconf")
 		m("tidyflags", "_tidyflags")
 		if has("USE_TIDY").lower() == "no": self._tidyuse = False
+		if has("CHECKSUM").lower(): self._changeDetectionMethod = CHANGE_CHECKSUM
+		if has("DATE").lower(): self._changeDetectionMethod = CHANGE_DATE
+		if has("CHANGE").lower() == "date": self._changeDetectionMethod = CHANGE_DATE
+		if has("CHANGE").lower() == "sig": self._changeDetectionMethod = CHANGE_CHECKSUM
 		else: self._tidyuse = True
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
@@ -319,7 +324,7 @@ class Site:
 		"""Returns the type of file change detection method. The 'cheksum'
 		method computes the SHA-1 signature for the file, while the
 		'modification' method uses the file last modification time."""
-		return CHANGE_DATE
+		return self._changeDetectionMethod
 	
 	def useTidy( self ):
 		"""Tells wether this site should use tidy to postprocess HTML
@@ -410,10 +415,10 @@ class SiteBuilder:
 		website or not. The path is converted to an absolute location, so
 		moving the website directory will cause a rebuild."""
 		# Maybe we already know if the path has changed
+		path = os.path.abspath(path)
 		res  = self.changed.get(path) 
 		if not path.endswith(".tmpl") and res != None:
 			return res
-		path = os.path.abspath(path)
 		data = None
 		def load_data(path):
 			fd  = file(path, 'r')
@@ -434,7 +439,8 @@ class SiteBuilder:
 				# If the template was flagged with ALWAYS_REBUILD, then we force
 				# the build
 				if RE_ALWAYS_REBUILD.match(line):
-					return True
+					template_has_changed = True
+					break
 				depends = RE_DEPENDS.match(line)
 				if depends:
 					dep_path = depends.group(1).strip()
@@ -444,7 +450,8 @@ class SiteBuilder:
 						dep_abs_path = os.path.abspath(os.path.dirname(path) + "/" + dep_path)
 					dep_path = dep_abs_path
 					if self.hasChanged(dep_path):
-						return True
+						template_has_changed = True
+						break
 			# If there was a template extended, we check if it is present in the
 			# templates directory
 			if template and template.startswith("Templates"):
@@ -506,6 +513,7 @@ class SiteBuilder:
 		"""Builds the website, or builds specifically the given paths."""
 		log("Mode is '%s', generating in '%s'" % (self.site.mode(),
 		shorten_path(self.site.output())))
+		log("Changes are detected by %s" % (self.site.changeDetectionMethod()))
 		self.usedResources = {}
 		self.precompileTemplates()
 		self.applyTemplates(paths)

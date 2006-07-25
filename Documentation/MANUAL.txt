@@ -9,24 +9,25 @@
 At first, you will need a Unix-based machine, or a Windows machine with an
 available shell (using MinGW or Cygwin), with Python 2.2+ installed.
 
-	1. [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
-	2. Ensure that [Cheetah](http://www.cheetahtemplate.org) (starting from version 0.9.7) is installed
-	3. Optionnaly install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
-	4. Optionnaly install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
+    1. [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
+    2. Ensure that [Cheetah](http://www.cheetahtemplate.org) (starting from version 0.9.7) is installed
+    3. Optionnaly install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
+    4. Optionnaly install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
 
 Once this preliminary setup is done, go into the uncompressed Tahchee directory
 and do
 
->	python setup.py install
+>   python setup.py install
 
 You now have the `tahchee` command available in your path, and should be ready
 to start using Tahchee.
 
-Note ______________________________________________________________________
-You can alternatively install Tahchee by copying the `tahchee` directory within the
-`Sources` directory of Tahchee within your Python `site-packages` directory,
-and running tahchee with the following command:
-`python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"`
+    Note ______________________________________________________________________
+
+    You can alternatively install Tahchee by copying the `tahchee` directory within the
+    `Sources` directory of Tahchee within your Python `site-packages` directory,
+    and running tahchee with the following command:
+    `python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"`
 
 
 2. First run
@@ -35,10 +36,10 @@ and running tahchee with the following command:
 To test your installation, go into Tahchee `Documentation/Example` directory and
 type `make`. The process should run, and output lines similar to those lines:
 
->	[ ] Mode is 'local', generating in 'Site/Local'
->	[ ] Precompiling template 'Example/Templates/Base'
->	[ ] Precompiling template 'Example/Templates/Page'
->	[ ] Generating file 'index.html'
+>   [ ] Mode is 'local', generating in 'Site/Local'
+>   [ ] Precompiling template 'Example/Templates/Base'
+>   [ ] Precompiling template 'Example/Templates/Page'
+>   [ ] Generating file 'index.html'
 
 This process will create the example HTML site in the `Site/Local` subdirectory.
 You will find the resulting HTML there. If you want to know what other
@@ -57,29 +58,29 @@ complete templates.
 
 To get a better idea of this, let's look at the example data:
 
->	|-- Pages
->	|   |-- index.html.tmpl
->	|   `-- screen.css
->	|-- Site
->	|-- Templates
->	|   |-- Base.tmpl
->	|   `-- Page.tmpl
+>   |-- Pages
+>   |   |-- index.html.tmpl
+>   |   `-- screen.css
+>   |-- Site
+>   |-- Templates
+>   |   |-- Base.tmpl
+>   |   `-- Page.tmpl
 
 Running `make` will populate your website project directory:
 
->	|-- Pages
->	|   |-- index.html.tmpl
->	|   `-- screen.css
->	|-- Site
->	|   `-- Local                 (this is the directory created by tahchee)
->	|       |-- index.html
->	|       `-- screen.css
->	|-- Templates
->	|   |-- Base.py               (these are 'compiled' versions of your templates)
->	|   |-- Base.tmpl
->	|   |-- Page.py
->	|   |-- Page.tmpl
->	|   |-- __init__.py
+>   |-- Pages
+>   |   |-- index.html.tmpl
+>   |   `-- screen.css
+>   |-- Site
+>   |   `-- Local                 (this is the directory created by tahchee)
+>   |       |-- index.html
+>   |       `-- screen.css
+>   |-- Templates
+>   |   |-- Base.py               (these are 'compiled' versions of your templates)
+>   |   |-- Base.tmpl
+>   |   |-- Page.py
+>   |   |-- Page.tmpl
+>   |   |-- __init__.py
 
 We see that the `Site/Local` was populated with the same content as the `Pages`
 directory, excepted files ending in `.tmpl` were stripped of their extension. Before
@@ -93,11 +94,11 @@ directory into executable Python code.
 
 Tahchee works as follows:
 
-	1. Compiles the `tmpl` files in the `Templates` directory
-	2. Compiles the `tmpl` files in the `Pages` directory and copies them in
-	the `Site/Local` subdirectory, stripping them of the `tmpl` extension
-	3. Copies other files from 'Pages' to the appropriate location in the
-	`Site/Local` directory.
+    1. Compiles the `tmpl` files in the `Templates` directory
+    2. Compiles the `tmpl` files in the `Pages` directory and copies them in
+    the `Site/Local` subdirectory, stripping them of the `tmpl` extension
+    3. Copies other files from 'Pages' to the appropriate location in the
+    `Site/Local` directory.
 
 4. More about templates
 =======================
@@ -105,28 +106,28 @@ Tahchee works as follows:
 You can learn the basics of using templates simply by looking at the files in
 the example. You will see that in our example, we have a template hierarchy:
 
->	Base
->	`-- Page
->	    `-- index.html
+>   Base
+>   `-- Page
+>       `-- index.html
 
 This means that a change in `Base` will affect `Page` as well as 'index.html`.
 By making new templates that "extend" other templates, you can build a whole
 set of specific templates for your site sections:
 
->	Base
->	`-- Page
->	    `-- SectionPage
->			|-- FAQPage
->			|-- UserPage
->			`-- ProjectPage
+>   Base
+>   `-- Page
+>       `-- SectionPage
+>           |-- FAQPage
+>           |-- UserPage
+>           `-- ProjectPage
 
 If you look closer at the provided templates, you will see that some
 variables (like `$site`) are already available. Tahchee actually provides access
 to Python object representing the current page and the website as a whole, using
 the following keywords:
 
-	- `$page` refers to the current page, and is a Page object
-	- `$site` refers to the current site, and is a Site object
+    - `$page` refers to the current page, and is a Page object
+    - `$site` refers to the current site, and is a Site object
 
 The Page and Site objects are defined in the Tahchee Python API, available 
 with this documentation (see `Documentation/tahchee-api.html`). For instance, the
@@ -151,23 +152,23 @@ directory) under a set of conditions:
 If you want a template to be *always applied*, you should simply add the
 following line to the top of your template:
 
->	## ALWAYS_REBUILD
->	#extends Templates.Page
->	...
+>   ## ALWAYS_REBUILD
+>   #extends Templates.Page
+>   ...
 
 If you want to state an explicit dependency between your template and another
 file, simply put its absolute path or path from the template parent directory as
 follows:
 
->	## DEPENDS = ../../path/to/my/file.data
->	#extends Templates.Page
->	...
+>   ## DEPENDS = ../../path/to/my/file.data
+>   #extends Templates.Page
+>   ...
 
 These indications will allow Tahchee to decide when something should be rebuilt
 or not. In case you would like to do that from the `Makefile`, you can invoke
 the `build.py` script directly with the page you want to rebuild:
 
->	python build.py Pages/index.html.tmpl
+>   python build.py Pages/index.html.tmpl
 
 5. Using Kiwi markup
 ====================
@@ -176,23 +177,23 @@ Since version 1.0.0, "Tahchee" comes integrated with the _Kiwi_ markup language.
 Kiwi is a simple, expressive text markup language that allows to create XML/HTML
 documents without actually writing all the HTML tag. For instance
 
->	Here is a paragraph, followed by a list:
->	
->	1) The list is numbered
->	2) Here is the second item
->	   - Here is an unnumbered sublist
->	3) And the third item
+>   Here is a paragraph, followed by a list:
+>   
+>   1) The list is numbered
+>   2) Here is the second item
+>      - Here is an unnumbered sublist
+>   3) And the third item
 
 generates the following HTML code:
 
->	<p>Here is a paragraph, followed by a list:</p>
->	<ul>
->		<li>The l ist is numbered </li>
->		<li>Here is the second item
->			<ul><li>Here is an unnumbered sublist</li></ul>
->		</li>
->		<li>And the third item</li>
->	</ul>
+>   <p>Here is a paragraph, followed by a list:</p>
+>   <ul>
+>       <li>The l ist is numbered </li>
+>       <li>Here is the second item
+>           <ul><li>Here is an unnumbered sublist</li></ul>
+>       </li>
+>       <li>And the third item</li>
+>   </ul>
 
 Kiwi comes pre-installed with _tahchee_. To use it, simply process any of your
 varuable with the `$site.kiwi' function. For instance, if your page template
@@ -200,7 +201,7 @@ contains a content section `<div id="content">$content</div>' that holds your
 page content, and that you expect `$content' to contain Kiwi text, simply use
 the following:
 
->	<div id="content">$site.kiwi($content)</div>
+>   <div id="content">$site.kiwi($content)</div>
 
 This will enable any content to be written in Kiwi. Also, note that 
 with kiwi you can mix HTML (or XML) with Kiwi without any problem, so you can
@@ -216,43 +217,46 @@ present you the available options.
 Your website `build.py` contains a set of options that you can change and edit.
 These options should look like the folowing.
 
->	# You can change the following things
->	# =============================================================================
->	URL     = "www.ivy.fr/tahchee"
->	INDEXES = ["index.*"]
->	IGNORES = [".cvs", ".CVS", ".svn", ".DS_Store"]
->	ACCEPTS = []
->	# =============================================================================
+>   # You can change the following things
+>   # =============================================================================
+>   URL     = "www.ivy.fr/tahchee"
+>   INDEXES = ["index.*"]
+>   IGNORES = [".cvs", ".CVS", ".svn", ".DS_Store"]
+>   ACCEPTS = []
+>   # =============================================================================
 
 There are many configuration options available. Here is the complete list of
 supported options.
 
-	- _URL_ allows you to set the main URL from which your website will be
-	  accessed. This is useful when you want to generate a website with absolute
-	  links.
-	
-	- _INDEXES_ is a set of "globs" (shell-like patterns) that tell which
-	  files should be considered as indexes. This also affects link expansion.
-	
-	- _IGNORES_ specifies a list of "globs" of files that should be ignored.
-	  These files will not be copied or processed. You can also give paths
-	  relative to the `Pages` directory.
+    - _URL_ allows you to set the main URL from which your website will be
+      accessed. This is useful when you want to generate a website with absolute
+      links.
+    
+    - _INDEXES_ is a set of "globs" (shell-like patterns) that tell which
+      files should be considered as indexes. This also affects link expansion.
+    
+    - _IGNORES_ specifies a list of "globs" of files that should be ignored.
+      These files will not be copied or processed. You can also give paths
+      relative to the `Pages` directory.
 
-	- _ACCEPTS_ specifies the list of "globs" that will be processed. You should
-	  leave this empty, as if you specify one "ACCEPT", then everything not
-	  accepted will be ignored.
-	
-	- _TIDY_ indicates the path to the HTML tidy utility (it is autodetected
-	  otherwise).
+    - _ACCEPTS_ specifies the list of "globs" that will be processed. You should
+      leave this empty, as if you specify one "ACCEPT", then everything not
+      accepted will be ignored.
+    
+    - _TIDY_ indicates the path to the HTML tidy utility (it is autodetected
+      otherwise).
 
-	- _USE_TIDY_ (takes `yes` or `no`, yes is the default), indicates if HTML
-	  tidy should be enabled or not.
+    - _USE_TIDY_ (takes `yes` or `no`, yes is the default), indicates if HTML
+      tidy should be enabled or not.
 
-	- _TIDYFLAGS_ specifies the flags that should be passed to HTML tidy. You
-	  can also use an environment variable with the same name.
+    - _TIDYFLAGS_ specifies the flags that should be passed to HTML tidy. You
+      can also use an environment variable with the same name.
 
-	- _TIDYCONF_ specifies the configuration file that should be used by HTML
-	  tidy. You can also use an environment variable with the same name.
+    - _TIDYCONF_ specifies the configuration file that should be used by HTML
+      tidy. You can also use an environment variable with the same name.
+
+    - _CHANGE_ can be set to `date` to detect changes based on the file date and
+      `sig` to detect changes based on the signature.
 
 7. Extending Tahchee
 ====================
@@ -277,19 +281,19 @@ Writing a plugin is very easy:
 Tahchee can be very powerful, provided you do things with a little bit of
 discipline. Here is what I would advice :
 
-	- Spend some time thinking about your site map, and the type of pages that
-	  you want to have.
-	- Do not write too many Templates, try to keep them minimal, and make a list
-	  of the variables names taht will be filled by Pages.
-	- Do not hesitate to use templates for your CSS files, as it can allow
-	  (among other things) to quickly change a set of predefined colors.
-	- Cheetah templates allow to use any Python module, so do not hesitate to
-	  add extra functionality in Python modules that you can put just inside
-	  your 'Templates' directory or anywhere in your PYTHONPATH.
-	- Do not hesistate to write Plugins to provide custom functionalities
-	  (automatic generation of pages or linked data)
+    - Spend some time thinking about your site map, and the type of pages that
+      you want to have.
+    - Do not write too many Templates, try to keep them minimal, and make a list
+      of the variables names taht will be filled by Pages.
+    - Do not hesitate to use templates for your CSS files, as it can allow
+      (among other things) to quickly change a set of predefined colors.
+    - Cheetah templates allow to use any Python module, so do not hesitate to
+      add extra functionality in Python modules that you can put just inside
+      your 'Templates' directory or anywhere in your PYTHONPATH.
+    - Do not hesistate to write Plugins to provide custom functionalities
+      (automatic generation of pages or linked data)
 
 I hope this small documentation will help you kickstart using Tahchee, if you
 have questions or comments, you can contact me at <sebastien@ivy.fr>.
 
-# vim: ts=4 sw=4 noet fenc=latin-1 syn=kiwi
+# vim: ts=4 sw=4 et fenc=latin-1 syn=kiwi
