@@ -13,7 +13,7 @@
 
 # Requires: Python 2.3, Cheetah, PIL and HTML tidy
 
-__version__ = "0.9.7"
+__version__ = "0.9.7.1"
 
 def version(): return __version__
 
@@ -426,7 +426,7 @@ class SiteBuilder:
 			fd.close()
 			return res
 		# Is the page a template ?
-		template_has_changed = False
+		template_has_changed = res or False
 		if path.endswith("tmpl"):
 			data = load_data(path)
 			# If so, we look for the extends defintion
@@ -456,8 +456,9 @@ class SiteBuilder:
 			# templates directory
 			if template and template.startswith("Templates"):
 				template_path = apply(os.path.join, template.split(".")[1:])
+				template_path = os.path.join(self.site.templatesDir, template_path + ".tmpl")
 				# And if this template has changed, then this one too
-				if self.hasChanged(os.path.join(self.site.templatesDir, template_path + ".tmpl")):
+				if self.hasChanged(template_path):
 					template_has_changed = True
 		# There is a SHA1 mode for real checksum change detection
 		if self.site.changeDetectionMethod() == CHANGE_CHECKSUM:
@@ -469,11 +470,15 @@ class SiteBuilder:
 			else:
 				warn("Path does not exists: " + path)
 				chksum  = "0"
+		# We get the previsou checksum
+		checksums = self.checksums.get(self.site.sig())
+		if checksums:
+			old_checksum = checksums.get(path)
+		else:
+			old_checksum = None
 		# Then we compare to registered checksums
 		# If the checksum has changed
-		if not self.checksums.get(self.site.sig()) \
-		or self.checksums.get(self.site.sig()).get(path) != chksum \
-		or template_has_changed:
+		if template_has_changed or old_checksum != chksum:
 			# We take care of the mode
 			if not self.checksums.get(self.site.sig()):
 				self.checksums[self.site.sig()] = {}

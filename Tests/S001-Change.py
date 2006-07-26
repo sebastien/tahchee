@@ -10,6 +10,27 @@ from tahchee.main import Site, SiteBuilder
 
 site = Site(None)
 builder = SiteBuilder(site)
-assert builder.hasChanged(__file__) == builder.hasChanged(__file__) ==  builder.hasChanged(__file__)
+a = builder.hasChanged(__file__)
+b = builder.hasChanged(__file__)
+c = builder.hasChanged(__file__)
+d = builder.hasChanged(os.path.abspath(__file__))
+print a
+print b
+print c
+print d
 
+assert a == b == c == d == True
+builder.changed  = {}
+a = builder.hasChanged(__file__)
+b = builder.hasChanged(__file__)
+c = builder.hasChanged(__file__)
+d = builder.hasChanged(os.path.abspath(__file__))
+
+print a
+print b
+print c
+print d
+assert a == b == c == d == False
+
+print "OK"
 # EOF

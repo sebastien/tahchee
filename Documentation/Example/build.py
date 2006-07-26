@@ -13,6 +13,7 @@ except:
 URL     = "http://www.mysite.org"
 IGNORES = (".cvs", ".CVS", ".svn", ".DS_Store")
 INDEXES = ("index.*")
+CHANGE  = "date"
 # =============================================================================
 # Do not modify this code
 if __name__ == "__main__":
