@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   21-Jul-2006
+# Last mod.         :   29-Jul-2006
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.3, Cheetah, PIL and HTML tidy
@@ -17,7 +17,7 @@ __version__ = "0.9.7.1"
 
 def version(): return __version__
 
-import os, sys, time, shutil, stat, pickle, sha, fnmatch, re, StringIO
+import os, sys, time, shutil, stat, pickle, sha, glob, fnmatch, re, StringIO
 
 try:
 	import Cheetah
@@ -442,16 +442,20 @@ class SiteBuilder:
 					template_has_changed = True
 					break
 				depends = RE_DEPENDS.match(line)
+				# Handles dependencies
 				if depends:
 					dep_path = depends.group(1).strip()
 					dep_path = os.path.expanduser(dep_path)
-					dep_abs_path = os.path.abspath(dep_path)
-					if dep_abs_path != dep_path:
-						dep_abs_path = os.path.abspath(os.path.dirname(path) + "/" + dep_path)
-					dep_path = dep_abs_path
-					if self.hasChanged(dep_path):
-						template_has_changed = True
-						break
+					dep_abspath = os.path.abspath(dep_path)
+					# The path may be relative to the current path
+					if dep_abspath != dep_path:
+						dep_abspath = os.path.abspath(os.path.dirname(path) + "/" + dep_path)
+					dep_path = dep_abspath
+					for dependency in glob.glob(dep_path):
+						if self.hasChanged(dependency):
+							template_has_changed = True
+							break
+					if template_has_changed: break
 			# If there was a template extended, we check if it is present in the
 			# templates directory
 			if template and template.startswith("Templates"):
@@ -789,7 +793,8 @@ BUILD_PY_DEFAULTS = """\
 URL     = "%s"
 INDEXES = ["index.*"]
 IGNORES = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
-ACCEPTS = []"""
+ACCEPTS = []
+CHANGE  = "date" """
 
 BASE_TMPL ="""\
 ## This is how we create a function in Cheetah. Here, the $site object is 

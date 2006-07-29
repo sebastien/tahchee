@@ -11,9 +11,10 @@ except:
 # You can change the following things
 # =============================================================================
 URL     = "http://www.mysite.org"
-IGNORES = (".cvs", ".CVS", ".svn", ".DS_Store")
-INDEXES = ("index.*")
-CHANGE  = "date"
+INDEXES = ["index.*"]
+IGNORES = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
+ACCEPTS = []
+CHANGE  = "date" 
 # =============================================================================
 # Do not modify this code
 if __name__ == "__main__":
