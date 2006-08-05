@@ -611,7 +611,7 @@ class SiteBuilder:
 				info("Copying  '%s'" % (ofile))
 				dest_dir  = os.path.dirname(ofile)
 				if not os.path.exists(dest_dir): os.makedirs(dest_dir)
-				shutil.copyfile(ifile, ofile)
+				shutil.copy(ifile, ofile)
 		# If we found a directory, we recurse
 		else:
 			if not os.path.exists(ofile):
