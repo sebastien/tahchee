@@ -10,7 +10,10 @@
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
-import kiwi.main as kiwi
+try:
+	import kiwi.main as kiwi
+except ImportError e:
+	import _kiwi.main as kiwi
 
 NAME    = "kiwi"
 VERSION = None

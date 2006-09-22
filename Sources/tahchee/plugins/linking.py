@@ -103,9 +103,10 @@ class LinkingPlugin:
 			common = c
 		# If there is no "to_file", we force the "/"
 		if not to_file: to_file = "/"
+		res = None
 		# Both paths have the same directories in common
 		if from_dirs == to_dirs:
-			return to_file
+			res = to_file
 		else:
 			prefix  = ""
 			if common == -1:
@@ -117,6 +118,7 @@ class LinkingPlugin:
 				if common < len(to_dirs):
 					prefix +=  "/".join(to_dirs[common:])
 			if prefix and not prefix[-1] == "/": prefix += "/"
-			return prefix + to_file
+			res = prefix + to_file
+		return res
 
 # EOF

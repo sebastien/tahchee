@@ -10,9 +10,11 @@ except:
 	sys.exit(-1)
 # You can change the following things
 # =============================================================================
-URL     = "http://www.mysite.org"
-IGNORES = (".cvs", ".CVS", ".svn", ".DS_Store")
-INDEXES = ("index.*")
+URL       = "http://www.mysite.org"
+IGNORES   = (".cvs", ".CVS", ".svn", ".DS_Store")
+INDEXES   = ("index.*")
+MAIN      = "index.html"
+SHOW_MAIN = True
 # =============================================================================
 # Do not modify this code
 if __name__ == "__main__":
