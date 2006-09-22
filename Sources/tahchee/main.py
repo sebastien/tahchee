@@ -238,8 +238,8 @@ class Site:
 		if has("CHANGE").lower() == "date": self._changeDetectionMethod = CHANGE_DATE
 		if has("CHANGE").lower().startswith("sig"): self._changeDetectionMethod = CHANGE_CHECKSUM
 		if has("MAIN"): self._main = has("MAIN")
-		if has("SHOW_MAIN") is False: self._showMain = False
-		if has("SHOW_MAIN") is True: self._showMain  = True
+		if options.get("SHOW_MAIN") is False: self._showMain = False
+		if options.get("SHOW_MAIN") is True: self._showMain  = True
 		else: self._tidyuse = True
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
