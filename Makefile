@@ -25,7 +25,8 @@
 
 # Project name. Do not put spaces.
 PROJECT         = tahchee
-PROJECT_VERSION = 0.9.7
+PROJECT_VERSION = 0.9.8
+
 PROJECT_STATUS  = DEVELOPMENT
 
 DOCUMENTATION   = Documentation
@@ -136,8 +137,8 @@ dist:
 	-C $(DISTRIBUTION) $(PROJECT)-$(PROJECT_VERSION)
 	@rm -rf $(DISTRIBUTION)/$(PROJECT)-$(PROJECT_VERSION)
 
-man: $(DOCUMENTATION)/MANUAL
-	kiwi -m -ilatin-1 $(DOCUMENTATION)/MANUAL  $(DOCUMENTATION)/MANUAL.html
+man: $(DOCUMENTATION)/MANUAL.txt
+	kiwi -m -ilatin-1 $(DOCUMENTATION)/MANUAL.txt  $(DOCUMENTATION)/MANUAL.html
 
 doc: man
 	@echo "Generating $(PROJECT) documentation"

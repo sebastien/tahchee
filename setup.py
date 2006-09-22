@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   14-Jul-2006
+# Last mod.         :   22-Sep-2006
 # -----------------------------------------------------------------------------
 
 import sys ; sys.path.insert(0, "Sources")
@@ -41,7 +41,7 @@ setup(
     url         = "http://www.ivy.fr/tahchee",
     download_url= "http://www.ivy.fr/tahchee/tahchee-%s.tar.gz" % (main.__version__) ,
     package_dir = { "": "Sources" },
-    packages    = ["tahchee", "tahchee.plugins"],
+    packages    = ["tahchee", "tahchee.plugins", "tahchee.plugins._kiwi"],
     scripts     = ["Scripts/tahchee"],
     classifiers = [
       "Development Status :: 4 - Beta",

@@ -12,7 +12,7 @@
 import os, sys, StringIO
 try:
 	import kiwi.main as kiwi
-except ImportError e:
+except ImportError:
 	import _kiwi.main as kiwi
 
 NAME    = "kiwi"
