@@ -22,8 +22,8 @@ import re, string, operator, getopt, codecs
 import xml.dom.minidom
 dom = xml.dom.minidom.getDOMImplementation()
 
-from kiwi.inlines import *
-from kiwi.blocks  import *
+from inlines import *
+from blocks  import *
 
 #------------------------------------------------------------------------------
 #

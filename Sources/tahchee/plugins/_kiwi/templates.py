@@ -12,7 +12,7 @@
 
 import re, xml.dom
 import sys
-from kiwi.formatting import *
+from formatting import *
 
 RE_EXPRESSION    =re.compile("\$\(([^\)]+)\)")
 

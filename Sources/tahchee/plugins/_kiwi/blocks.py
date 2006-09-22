@@ -13,7 +13,7 @@
 # -----------------------------------------------------------------------------
 
 import re, string
-from kiwi.formatting import *
+from formatting import *
 
 __doc__       = """Write module doc here"""
 __pychecker__ = "unusednames=recogniseInfo,content"

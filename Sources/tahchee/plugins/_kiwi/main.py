@@ -30,7 +30,7 @@ import re, string, operator, getopt, codecs
 import xml.dom.minidom
 dom = xml.dom.minidom.getDOMImplementation()
 
-from kiwi import core, kiwi2html
+import core, kiwi2html
 
 #------------------------------------------------------------------------------
 #

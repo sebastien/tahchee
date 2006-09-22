@@ -12,8 +12,8 @@
 
 import re, xml.dom
 import sys
-from kiwi.formatting import *
-import kiwi.templates
+from formatting import *
+import templates
 
 #------------------------------------------------------------------------------
 #
@@ -21,7 +21,7 @@ import kiwi.templates
 #
 #------------------------------------------------------------------------------
 
-class Processor(kiwi.templates.Processor):
+class Processor(templates.Processor):
 
 	def generate( self, xmlDocument, bodyOnly=False, variables={} ):
 		node = xmlDocument.getElementsByTagName("Document")[0]

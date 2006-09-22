@@ -18,7 +18,7 @@
 #
 
 import re, textwrap, xml.dom
-from kiwi.templates import Processor
+from templates import Processor
 
 # Text to HTML: http://bhaak.dyndns.org/vilistextum/screenshots.html
 # From <http://www.boddie.org.uk/python/HTML.html>
