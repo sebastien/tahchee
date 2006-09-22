@@ -1,18 +1,18 @@
 == TAHCHEE MANUAL
 -- Author: Sébastien Pierre
--- Version: 0.9.7
+-- Version: 0.9.8
 
 
 1. Quick setup
 ==============
 
 At first, you will need a Unix-based machine, or a Windows machine with an
-available shell (using MinGW or Cygwin), with Python 2.2+ installed.
+available shell (using MinGW or Cygwin), with Python 2.4+ installed.
 
     1. [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
     2. Ensure that [Cheetah](http://www.cheetahtemplate.org) (starting from version 0.9.7) is installed
-    3. Optionnaly install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
-    4. Optionnaly install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
+    3. Optionally install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
+    4. Optionally install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
 
 Once this preliminary setup is done, go into the uncompressed Tahchee directory
 and do
@@ -135,8 +135,18 @@ with this documentation (see `Documentation/tahchee-api.html`). For instance, th
 ensure that the link target exists.
 
 Since Tahchee 0.9.7 a plugin system allows to make additional variables
-available to templates. This allows you to write your custom Python classe and
+available to templates. This allows you to write your custom Python class and
 functions, and easily bind them to your templates.
+
+    Notes ___________________________________________________________________
+
+    Starting from Tahchee 0.9.8, you can use extensions like `.tmpl.html` as
+    well, instead of `html.tmpl`. This will make it easier for some editors
+    to get the proper syntax highlighting.
+
+    This is however only available to `Pages`. General templates (those in
+    `Templates`) have to stay as `.tmpl`. There are syntax coloring modes
+    for Cheetah templates available in many text editors.
 
 4.1 Templates and the build process
 -----------------------------------
@@ -173,7 +183,7 @@ the `build.py` script directly with the page you want to rebuild:
 5. Using Kiwi markup
 ====================
 
-Since version 1.0.0, "Tahchee" comes integrated with the _Kiwi_ markup language.
+Since version 0.9.7, "Tahchee" comes integrated with the _Kiwi_ markup language.
 Kiwi is a simple, expressive text markup language that allows to create XML/HTML
 documents without actually writing all the HTML tag. For instance
 
@@ -196,7 +206,7 @@ generates the following HTML code:
 >   </ul>
 
 Kiwi comes pre-installed with _tahchee_. To use it, simply process any of your
-varuable with the `$site.kiwi' function. For instance, if your page template
+variable with the `$site.kiwi' function. For instance, if your page template
 contains a content section `<div id="content">$content</div>' that holds your
 page content, and that you expect `$content' to contain Kiwi text, simply use
 the following:
@@ -207,6 +217,10 @@ This will enable any content to be written in Kiwi. Also, note that
 with kiwi you can mix HTML (or XML) with Kiwi without any problem, so you can
 gradually convert your HTML files to Kiwi markup if you need to.
 
+Kiwi is pretty much similar to [Markdown](http://daringfireball.net/projects/markdown/),
+but maybe more powerful in some areas. You can learn more about
+Kiwi [here](http://www.ivy.fr/kiwi).
+
 6. Configuration
 ================
 
@@ -215,7 +229,7 @@ should be made in the `build.py` file in your Tahchee website directory, which
 present you the available options.
 
 Your website `build.py` contains a set of options that you can change and edit.
-These options should look like the folowing.
+These options should look like the following.
 
 >   # You can change the following things
 >   # =============================================================================
@@ -231,6 +245,13 @@ supported options.
     - _URL_ allows you to set the main URL from which your website will be
       accessed. This is useful when you want to generate a website with absolute
       links.
+
+    - _MAIN_ indicates the relative path of the main HTML file for your website.
+      This is usually `index.html`. When _SHOW MAIN_ is set, then the main file
+      will be displayed in your browser after each build. (new in 0.9.8)
+
+    - _SHOW MAIN_ (can be `True` or `False`), indicate if you want your main
+      page to be shown in your browser after each build. (new in 0.9.8)
     
     - _INDEXES_ is a set of "globs" (shell-like patterns) that tell which
       files should be considered as indexes. This also affects link expansion.
@@ -243,7 +264,7 @@ supported options.
       leave this empty, as if you specify one "ACCEPT", then everything not
       accepted will be ignored.
     
-    - _TIDY_ indicates the path to the HTML tidy utility (it is autodetected
+    - _TIDY_ indicates the path to the HTML tidy utility (it is auto-detected
       otherwise).
 
     - _USE_TIDY_ (takes `yes` or `no`, yes is the default), indicates if HTML
@@ -284,13 +305,13 @@ discipline. Here is what I would advice :
     - Spend some time thinking about your site map, and the type of pages that
       you want to have.
     - Do not write too many Templates, try to keep them minimal, and make a list
-      of the variables names taht will be filled by Pages.
+      of the variables names that will be filled by Pages.
     - Do not hesitate to use templates for your CSS files, as it can allow
       (among other things) to quickly change a set of predefined colors.
     - Cheetah templates allow to use any Python module, so do not hesitate to
       add extra functionality in Python modules that you can put just inside
       your 'Templates' directory or anywhere in your PYTHONPATH.
-    - Do not hesistate to write Plugins to provide custom functionalities
+    - Do not hesitate to write Plugins to provide custom functionalities
       (automatic generation of pages or linked data)
 
 I hope this small documentation will help you kickstart using Tahchee, if you

@@ -8,16 +8,16 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   29-Jul-2006
+# Last mod.         :   22-Sep-2006
 # -----------------------------------------------------------------------------
 
-# Requires: Python 2.3, Cheetah, PIL and HTML tidy
+# Requires: Python 2.4, Cheetah, PIL and HTML tidy
 
-__version__ = "0.9.7.1"
+__version__ = "0.9.8"
 
 def version(): return __version__
 
-import os, sys, time, shutil, stat, pickle, sha, glob, fnmatch, re, StringIO
+import os, sys, time, shutil, stat, pickle, sha, glob, fnmatch, re, StringIO, webbrowser
 
 try:
 	import Cheetah
@@ -45,7 +45,7 @@ if not HTMLTIDY:
 CHANGE_CHECKSUM="signature"
 CHANGE_DATE    ="date"
 RE_ALWAYS_REBUILD = re.compile("^\s*##\s*ALWAYS_REBUILD\s*$")
-RE_DEPENDS     = re.compile("^\s*##\s*DEPENDS\s*=(.+)$")
+RE_DEPENDS        = re.compile("^\s*##\s*DEPENDS\s*=(.+)$")
 
 #------------------------------------------------------------------------------
 #
@@ -201,6 +201,8 @@ class Site:
 		self._tidyuse     = True
 		self._tidyconf    = os.environ.get("TIDYCONF") or ""
 		self._tidyflags   = os.environ.get("TIDYFLAGS") or ""
+		self._main        = "index.html"
+		self._showMain    = True
 		self._processOptions(locals)
 		self._processOptions(kwargs)
 		# We insert the plugins directory into the Python modules path
@@ -234,7 +236,10 @@ class Site:
 		if has("CHECKSUM").lower(): self._changeDetectionMethod = CHANGE_CHECKSUM
 		if has("DATE").lower(): self._changeDetectionMethod = CHANGE_DATE
 		if has("CHANGE").lower() == "date": self._changeDetectionMethod = CHANGE_DATE
-		if has("CHANGE").lower() == "sig": self._changeDetectionMethod = CHANGE_CHECKSUM
+		if has("CHANGE").lower().startswith("sig"): self._changeDetectionMethod = CHANGE_CHECKSUM
+		if has("MAIN"): self._main = has("MAIN")
+		if has("SHOW_MAIN") is False: self._showMain = False
+		if has("SHOW_MAIN") is True: self._showMain  = True
 		else: self._tidyuse = True
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
@@ -293,9 +298,18 @@ class Site:
 		else:
 			return True
 
+	def isTemplate( self, path ):
+		"""Tells if the given path represents a template, and returns the
+		result."""
+		res = path.split(".tmpl")
+		if len(res) == 2:
+			return "".join(res)
+		else:
+			return None
+
 	def templates( self ):
-		"""Returns a list of Cheetah templates (files ending in .tmpl) contained
-		in the templates directory."""
+		"""Returns a list of Cheetah templates (files ending in .tmpl or like
+		.tmpl.xxxx) contained in the templates directory."""
 		if not os.path.exists(self.templatesDir):
 			err("Templates directory does not exist: " + self.templatesDir)
 		# Ensures that the "__init__.py" exists
@@ -308,7 +322,7 @@ class Site:
 		for file_or_dir in os.listdir(self.templatesDir):
 			current_path = os.path.join(self.templatesDir, file_or_dir)
 			if not os.path.isdir( current_path ):
-				if current_path[-5:] == ".tmpl":
+				if self.isTemplate(current_path):
 					#templates.append(current_path)
 					yield current_path
 		#return templates
@@ -417,7 +431,7 @@ class SiteBuilder:
 		# Maybe we already know if the path has changed
 		path = os.path.abspath(path)
 		res  = self.changed.get(path) 
-		if not path.endswith(".tmpl") and res != None:
+		if not self.site.isTemplate(path) and res != None:
 			return res
 		data = None
 		def load_data(path):
@@ -427,7 +441,7 @@ class SiteBuilder:
 			return res
 		# Is the page a template ?
 		template_has_changed = res or False
-		if path.endswith("tmpl"):
+		if self.site.isTemplate(path):
 			data = load_data(path)
 			# If so, we look for the extends defintion
 			template = None
@@ -474,7 +488,7 @@ class SiteBuilder:
 			else:
 				warn("Path does not exists: " + path)
 				chksum  = "0"
-		# We get the previsou checksum
+		# We get the previous checksum
 		checksums = self.checksums.get(self.site.sig())
 		if checksums:
 			old_checksum = checksums.get(path)
@@ -528,6 +542,8 @@ class SiteBuilder:
 		self.applyTemplates(paths)
 		self.copyCreatedFiles()
 		self.saveChecksums()
+		if self.site._showMain:
+			webbrowser.open("file://" + os.path.join(self.site.output(), self.site._main))
 
 	def precompileTemplates( self ):
 		"""Looks for Cheetah templates and precompile them (into Python code)
@@ -604,14 +620,14 @@ class SiteBuilder:
 		# We ensure that it is not a directory
 		if not os.path.isdir(ifile):
 			# If there is a page template, then we simply apply it
-			if filename[-4:]=="tmpl":
+			if self.site.isTemplate(filename):
 				self.applyTemplate(ifile, force)
 			# If it is a resource, we simply copy it
 			elif force or self.hasChanged( ifile ):
 				info("Copying  '%s'" % (ofile))
 				dest_dir  = os.path.dirname(ofile)
 				if not os.path.exists(dest_dir): os.makedirs(dest_dir)
-				shutil.copy(ifile, ofile)
+				shutil.copyfile(ifile, ofile)
 		# If we found a directory, we recurse
 		else:
 			if not os.path.exists(ofile):
@@ -625,7 +641,7 @@ class SiteBuilder:
 		assert template == os.path.abspath(template), "Path must be absolute"
 		# The local path is the path to the template that is relative to the
 		# site pages directory. The template extension is removed.
-		template_localpath  = os.path.splitext(template[len(self.site.pages())+1:])[0]
+		template_localpath  = self.site.isTemplate(template[len(self.site.pages())+1:])
 		template_url        = template_localpath
 		# The template outputpath corresponds to the file that will be created
 		# after expanding the template.
@@ -790,11 +806,13 @@ if __name__ == "__main__":
 """
 
 BUILD_PY_DEFAULTS = """\
-URL     = "%s"
-INDEXES = ["index.*"]
-IGNORES = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
-ACCEPTS = []
-CHANGE  = "date" """
+URL       = "%s"
+MAIN      = "index.html"
+SHOW_MAIN = True
+INDEXES   = ["index.*"]
+IGNORES   = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
+ACCEPTS   = []"""
+
 
 BASE_TMPL ="""\
 ## This is how we create a function in Cheetah. Here, the $site object is 

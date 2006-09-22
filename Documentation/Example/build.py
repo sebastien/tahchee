@@ -10,11 +10,13 @@ except:
 	sys.exit(-1)
 # You can change the following things
 # =============================================================================
-URL     = "http://www.mysite.org"
-INDEXES = ["index.*"]
-IGNORES = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
-ACCEPTS = []
-CHANGE  = "date" 
+URL       = "http://www.mysite.org"
+INDEXES   = ["index.*"]
+IGNORES   = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
+ACCEPTS   = []
+CHANGE    = "date"
+MAIN      = "index.html"
+SHOW_MAIN = True
 # =============================================================================
 # Do not modify this code
 if __name__ == "__main__":
