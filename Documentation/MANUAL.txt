@@ -6,7 +6,7 @@
 1. Quick setup
 ==============
 
-At first, you will need a Unix-based machine, or a Windows machine with an
+First, you will need a Unix-based machine, or a Windows machine with an
 available shell (using MinGW or Cygwin), with Python 2.4+ installed.
 
     1. [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
@@ -50,7 +50,7 @@ options are available, type `make info`.
 
 Tahchee is best described as a "website compiler". You design your site with
 _templates_, which contain the common parts between all your pages in your
-website. Once you wrote your templates, you can start writing _pages_ which ''fill in the
+website. Once you have written your templates, you can start writing _pages_ which ''fill in the
 blanks'' of your templates. The main difference between a template and a page is
 that a template needs the data provided by a page to render to an HTML (or
 whatever format) file. In other words, templates are incomplete pages, and pages
@@ -206,19 +206,19 @@ generates the following HTML code:
 >   </ul>
 
 Kiwi comes pre-installed with _tahchee_. To use it, simply process any of your
-variable with the `$site.kiwi' function. For instance, if your page template
+variable with the `$kiwi' function. For instance, if your page template
 contains a content section `<div id="content">$content</div>' that holds your
 page content, and that you expect `$content' to contain Kiwi text, simply use
 the following:
 
->   <div id="content">$site.kiwi($content)</div>
+>   <div id="content">$kiwi($content)</div>
 
 This will enable any content to be written in Kiwi. Also, note that 
 with kiwi you can mix HTML (or XML) with Kiwi without any problem, so you can
 gradually convert your HTML files to Kiwi markup if you need to.
 
 Kiwi is pretty much similar to [Markdown](http://daringfireball.net/projects/markdown/),
-but maybe more powerful in some areas. You can learn more about
+but may be more powerful in some areas. You can learn more about
 Kiwi [here](http://www.ivy.fr/kiwi).
 
 6. Configuration
