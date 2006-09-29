@@ -322,7 +322,7 @@ class Site:
 		for file_or_dir in os.listdir(self.templatesDir):
 			current_path = os.path.join(self.templatesDir, file_or_dir)
 			if not os.path.isdir( current_path ):
-				if self.isTemplate(current_path):
+				if current_path.endswith(".tmpl"):
 					#templates.append(current_path)
 					yield current_path
 		#return templates
@@ -1049,7 +1049,6 @@ def run( args ):
 			sys.exit()
 		elif not os.path.exists(directory):
 			if not os.path.exists(os.path.dirname(os.path.abspath(directory))):
-				print os.path.dirname(directory)
 				print "Parent directory does not exist. Please create it."
 				sys.exit()
 			else:
