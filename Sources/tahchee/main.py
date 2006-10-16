@@ -192,6 +192,7 @@ class Site:
 		self.templatesDir = os.path.join(self.rootDir, "Templates")
 		self.fontsDir     = os.path.join(self.rootDir, "Fonts")
 		self.pluginsDir   = os.path.join(self.rootDir, "Plugins")
+		self.sourcesDir   = os.path.join(self.rootDir, "Sources")
 		self._changeDetectionMethod = CHANGE_CHECKSUM
 		self._plugins     = []
 		self._accepts     = []
@@ -207,6 +208,7 @@ class Site:
 		self._processOptions(kwargs)
 		# We insert the plugins directory into the Python modules path
 		sys.path.insert(0, self.pluginsDir)
+		sys.path.insert(0, self.sourcesDir)
 		# This array contains a list of files created during the generation of
 		# the templates. These files will be copied after the templates are
 		# applied.

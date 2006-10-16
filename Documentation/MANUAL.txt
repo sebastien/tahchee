@@ -293,8 +293,21 @@ Writing a plugin is very easy:
  - Publish your plugins by putting them within the `Plugins` directory
  - Type `tahchee plugins` to make sure that your plugin was registered
 
+If you don't want to write plugins, you can alternatively drop some Python
+modules within the `Sources` directory of your Tahchee website (you have to
+create this directory, which is not created by default). Tahchee will then
+automatically add this directory to the Python path.
 
-# - POSSIBILITY TO DECLARE NEW FUNCTIONS...
+So, if you create a module in `Sources/mymodule.py`, you can use it in your page
+templates by doing:
+
+>   #import mymodule
+
+and then
+
+>   $mymodule.doSomething()...
+
+This is probably the easies way to extend Tahchee functionality.
 
 7. Some advices
 ===============
