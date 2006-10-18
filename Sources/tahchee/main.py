@@ -1046,10 +1046,7 @@ def run( args ):
 		# Gets the destination directory
 		if len ( args ) == 3: directory = args[2]
 		# Checks that the directory is empty or not exists
-		if os.path.exists(directory) and os.listdir(directory):
-			print "You must first empty '%s'" % (directory)
-			sys.exit()
-		elif not os.path.exists(directory):
+		if not os.path.exists(directory):
 			if not os.path.exists(os.path.dirname(os.path.abspath(directory))):
 				print "Parent directory does not exist. Please create it."
 				sys.exit()

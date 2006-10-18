@@ -6,7 +6,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   23-Mar-2006
-# Last mod.         :   13-Jul-2006
+# Last mod.         :   18-Oct-2006
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -43,13 +43,13 @@ class KiwiPlugin:
 			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
 			return path
 
-	def process( self, text ):
+	def process( self, text, level=0 ):
 		"""If Kiwi is available, the given text will be interpreted as Kiwi
 		markup and HTML will be generated from it. If Kiwi is not available, a
 		warning will be issued, and the text will be displayed as-is."""
 		if kiwi:
 			s = StringIO.StringIO(text)
-			_, r = kiwi.run("-m --body-only --", s, noOutput=True)
+			_, r = kiwi.run("-m --body-only --level=%s --" % (level), s, noOutput=True)
 			s.close()
 			return r
 		else:
@@ -57,6 +57,6 @@ class KiwiPlugin:
 			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
 			return text
 	
-	def __call__( self, text ):
-		return self.process(text)
+	def __call__( self, text, level=0 ):
+		return self.process(text,level)
 # EOF
