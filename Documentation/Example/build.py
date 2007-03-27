@@ -16,6 +16,7 @@ IGNORES   = ["*.sw?", "*.bak", "*.pyc", ".cvs", ".CVS", ".svn", ".DS_Store"]
 ACCEPTS   = []
 CHANGE    = "date"
 MAIN      = "index.html"
+USE_TIDY  = False
 SHOW_MAIN = True
 # =============================================================================
 # Do not modify this code

@@ -1,8 +1,20 @@
 #extends Templates.Page
+##
+## The DEPENDS line specifies files on which this page template depends. In this
+## case, whenever a file starting with 'depen' and ending with '.data' changes,
+## this page template will be generated again.
+##
 ##DEPENDS=depen*.data
 #def title
 Welcome to Tahchee
 #end def
+##
+## The following 'kiwiContent' declares text written in the Kiwi
+## (http://www.ivy.fr/kiwi) markup language. Kiwi allows you to write HTML in
+## much easier way, without having to type most of HTML tags. To convert
+## some string (that you give directly or that you reference) from Kiwi to
+## HTML, you can invoke the kiwi plugin by doing '$kiwi($mykiwicontent)'.
+## 
 #def kiwiContent
 
 	Tahchee also allows to use the [Kiwi markup language][KIWI] to easily write your
@@ -18,7 +30,7 @@ Welcome to Tahchee
 
 	This will allow to write your websites much more easily than before.
 
-	[KIWI] <http://www.ivy.fr/kiwi>
+	[KIWI]: <http://www.ivy.fr/kiwi>
 
 #end def
 #def content
@@ -33,6 +45,11 @@ Welcome to Tahchee
 set of extensions to the <a href="http://www.cheetahtemplate.org">Cheetah</a>
 template system.
 </p>
+
+<p>Here is <a href="http://www.ivy.fr/kiwi">Kiwi</a> markup content:</p>
+<pre>$escape.toHTML($kiwiContent)</pre>
+<p>and here is the rendered version</p>
+<blockquote>$kiwi($kiwiContent)</blockquote>
 
 <p>This page was created by the default templates provided, and will help you
 understand how to get started with Tahchee.</p>
