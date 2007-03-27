@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   25-Jul-2006
+# Last mod.         :   27-Mar-2007
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -17,7 +17,7 @@ __doc__ = """Kiwi is an advanced markup text processor, which can be used as
 an embedded processor in any application. It is fast, extensible and outputs an
 XML DOM."""
 
-__version__ = "0.7.9"
+__version__ = "0.8.1"
 __pychecker__ = "blacklist=cDomlette,cDomlettec"
 
 import re, string, operator, getopt, codecs
@@ -58,12 +58,14 @@ Options:
    -o --output-encoding          Allows to specify the output encoding
    -t --tab                      The value for tabs (tabs equal N sapces).
                                  Set to 4 by default.
+   -f --offsets                  Add offsets information
    -p --pretty                   Pretty prints the output XML, this should only
                                  be used for viewing the output.
    -m --html                     Outputs an HTML file corresponding to the Kiwi
                                  document
       --no-style                 Does not include the default CSS in the HTML
       --body-only                Only returns the content of the <body< element
+      --level=n                  If n>0, n will transform HTML h1 to h2, etc...
 
    The available encodings are %s
 
@@ -114,10 +116,10 @@ def run( arguments, input = None, noOutput=False ):
 
 	# --We extract the arguments
 	try:
-		optlist, args = getopt.getopt(arguments, "hpmvi:o:t:",\
-		["input-encoding=", "output-encoding=", "help", "html",
+		optlist, args = getopt.getopt(arguments, "hpmfvi:o:t:",\
+		["input-encoding=", "output-encoding=", "offsets", "help", "html",
 		"tab=", "version", "pretty", "no-style", "nostyle",
-		"body-only", "bodyonly"])
+		"body-only", "bodyonly", "level="])
 	except:
 		args=[]
 		optlist = []
@@ -138,10 +140,12 @@ def run( arguments, input = None, noOutput=False ):
 
 	# We set attributes
 	pretty_print    = 0
+	show_offsets    = False
 	validate_output = 0
 	generate_html   = 1
 	no_style        = 0
 	body_only       = 0
+	level_offset    = 0
 	input_enc       = ASCII
 	output_enc      = ASCII
 	if LATIN1 in ENCODINGS:
@@ -193,6 +197,10 @@ def run( arguments, input = None, noOutput=False ):
 		elif opt in ('-m', '--html'):
 			generate_html = 1
 			pretty_print  = 0
+		elif opt in ('-f', '--offsets'):
+			show_offsets = True
+		elif opt in ('--level'):
+			level_offset = min(10, max(0, int(arg)))
 
 	# We check the arguments
 	if input==None and len(args)<1:
@@ -241,12 +249,13 @@ def run( arguments, input = None, noOutput=False ):
 
 	if type(data) != unicode:
 		data = data.decode(input_enc)
-	xml_document = parser.parse(data)
+	xml_document = parser.parse(data, offsets=show_offsets)
 
 	result = None
 	if generate_html:
 		variables = {}
-		css_file = file(os.path.dirname(__file__) + "/screen-kiwi.css")
+		variables["LEVEL"] = level_offset
+		css_file = file(os.path.join(os.path.dirname(kiwi2html.__file__), "screen-kiwi.css"))
 		if not no_style:
 			variables["HEADER"] = "\n<style><!-- \n%s --></style>" % (css_file.read())
 			variables["ENCODING"] = output_enc

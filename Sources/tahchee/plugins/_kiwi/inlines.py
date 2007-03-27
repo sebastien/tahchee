@@ -7,7 +7,7 @@
 # Author            :   Sebastien Pierre (SPE)           <sebastien@type-z.org>
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   25-Jul-2006
+# Last mod.         :   21-Mar-2007
 # -----------------------------------------------------------------------------
 
 import re
@@ -55,6 +55,8 @@ CODE             = u"`([^\`]+)`"
 RE_CODE          = re.compile(CODE, re.LOCALE|re.MULTILINE)
 CODE_2           = u"``((`?[^`])+)``"
 RE_CODE_2        = re.compile(CODE_2, re.LOCALE|re.MULTILINE)
+CODE_3           = u"'([^\']+)'"
+RE_CODE_3        = re.compile(CODE_3, re.LOCALE|re.MULTILINE)
 PRE              = u"^((\s*\>(\t|    ))(.*)\n)+"
 RE_PRE           = re.compile(PRE, re.LOCALE|re.MULTILINE)
 EMPHASIS         = u"\*([^*]+)\*"
@@ -93,7 +95,7 @@ EMAIL            = u"\<([\w.\-_]+@[\w.\-_]+)\>"
 RE_EMAIL         = re.compile(EMAIL, re.LOCALE|re.MULTILINE)
 URL              = u"\<([A-z]+://[^\>]+)\>"
 RE_URL           = re.compile(URL, re.LOCALE|re.MULTILINE)
-LINK             = u"""\[([^\]]+)\]\s*((\(([^ ]+)(\s+"([^"]+)"\s*)?\))|\[([\w\s]+)\])"""
+LINK             = u"""\[([^\]]+)\]\s*((\(([^ \)]+)(\s+"([^"]+)"\s*)?\))|\[([\w\s]+)\])"""
 RE_LINK          = re.compile(LINK, re.LOCALE|re.MULTILINE)
 
 # Custom markup
@@ -443,7 +445,7 @@ class MarkupInlineParser( InlineParser ):
 					if context.offsetInBlock(next_block[0]) or context.offsetInBlock(next_block[1]):
 						end_offset  = context.blockEndOffset
 						context.setOffset(context.blockStartOffset)
-						while context.getOffset() < end_offset :
+						while context.getOffset() < markup_end :
 							context.parser._parseNextBlock(context, end=markup_end)
 					# If there was no block contained, we parse the text as a
 					# single block

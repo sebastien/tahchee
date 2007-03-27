@@ -7,7 +7,7 @@
 # Author            :   Sebastien Pierre                 <sebastien@type-z.org>
 # -----------------------------------------------------------------------------
 # Creation date     :   07-Feb-2006
-# Last mod.         :   17-Jul-2006
+# Last mod.         :   18-Oct-2006
 # -----------------------------------------------------------------------------
 
 import re, xml.dom
@@ -117,7 +117,7 @@ def wattrs( element ):
 	)
 
 def convertContent( element ):
-	return process(element, wdiv(element, """<div id='content'>$(*)</div>"""))
+	return process(element, wdiv(element, """<div class='content'>$(*)</div>"""))
 
 def convertContent_bodyonly( element ):
 	return process(element, wdiv(element, """$(*)"""))
@@ -132,10 +132,11 @@ def convertHeading( element ):
 	return process(element, wspan(element, "$(*)"))
 
 def convertSection( element ):
-	level = int(element.getAttributeNS(None, "_depth")) + 1
+	offset = element._processor.variables.get("LEVEL") or 0
+	level = int(element.getAttributeNS(None, "_depth")) + 1 + offset
 	return process(element,
-	  '<div class="section"><a class="link">'
-	  + '<h%d class="heading">$(Heading)</h%d></a>' % (level, level)
+	  '<div class="section">'
+	  + '<h%d class="heading">$(Heading)</h%d>' % (level, level)
 	  + '<div class="level%d">$(Content:section)</div></div>' % (level)
 	)
 

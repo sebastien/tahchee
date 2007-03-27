@@ -7,7 +7,7 @@
 # Author            :   Sebastien Pierre (SPE)           <sebastien@type-z.org>
 # -----------------------------------------------------------------------------
 # Creation date     :   06-Mar-2006
-# Last mod.         :   10-Aug-2006
+# Last mod.         :   18-Oct-2006
 # -----------------------------------------------------------------------------
 
 import re, xml.dom
@@ -108,6 +108,7 @@ class Processor:
 		if element.nodeType == xml.dom.Node.TEXT_NODE:
 			return escapeHTML(element.data)
 		elif element.nodeType == xml.dom.Node.ELEMENT_NODE:
+			element._processor = self
 			fname = element.nodeName
 			if selector: fname += ":" + selector
 			func  = self.expressionTable.get(fname)
