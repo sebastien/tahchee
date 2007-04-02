@@ -210,7 +210,7 @@ class Site:
 		self._toProcess    = []
 		sys.path.append(self.rootDir)
 
-	def _detectHTMLTidy(tidypath):
+	def _detectHTMLTidy(self, tidypath):
 		"""Utility function that looks if HTML tidy is installed"""
 		tidypath = os.path.normpath(tidypath)
 		try:
@@ -239,7 +239,7 @@ class Site:
 		m("tidyConf", "_tidyConf")
 		m("tidyflags", "_tidyFlags")
 		for tidy_path in [has("TIDY"), "tidy"]:
-			tidy_path = self._detectHTMLTidy(_tidypath)
+			tidy_path = self._detectHTMLTidy(tidy_path)
 			if tidy_path is not None:
 				self._tidy = tidy_path
 				if self._tidy == "tidy":
