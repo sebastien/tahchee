@@ -7,11 +7,14 @@
 # Author            :   Sebastien Pierre                     <sebastien@ivy.fr>
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
+# Contibutors       :   Rafael Villar Burke                 <pachi@rvburke.com>
+# -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   22-Sep-2006
+# Last mod.         :   02-Apr-2006
 # -----------------------------------------------------------------------------
 
-# Requires: Python 2.4, Cheetah, PIL and HTML tidy
+# Requires: Python 2.4, Cheetah
+# Recommends: PIL, HTML Tidy
 
 __version__ = "0.9.8"
 
@@ -30,20 +33,9 @@ try:
 except:
 	print "Cheetah 0.9.17+ is required. See <http://www.cheetahtemplate.org>"
 	sys.exit()
-	
-# Here we look if HTML tidy is installed
-# FIXME: For Windows, the path should be set from somewhere
-def detectHTMLTidy():
-	_in, _out, _err = os.popen3("which tidy")
-	p = _out.read()
-	return p.strip()
 
-HTMLTIDY = detectHTMLTidy()
-if not HTMLTIDY:
-	print "HTML tidy is suggested to enable HTML file clean-up and compression"
-
-CHANGE_CHECKSUM="signature"
-CHANGE_DATE    ="date"
+CHANGE_CHECKSUM   ="signature"
+CHANGE_DATE       ="date"
 RE_ALWAYS_REBUILD = re.compile("^\s*##\s*ALWAYS_REBUILD\s*$")
 RE_DEPENDS        = re.compile("^\s*##\s*DEPENDS\s*=(.+)$")
 
@@ -198,10 +190,10 @@ class Site:
 		self._accepts     = []
 		self._ignores     = []
 		self._indexes     = []
-		self._tidy        = HTMLTIDY
-		self._tidyuse     = True
-		self._tidyconf    = os.environ.get("TIDYCONF") or ""
-		self._tidyflags   = os.environ.get("TIDYFLAGS") or ""
+		self._tidy        = None
+		self._tidyEnabled = True
+		self._tidyConf    = os.environ.get("TIDYCONF") or ""
+		self._tidyFlags   = os.environ.get("TIDYFLAGS") or ""
 		self._main        = "index.html"
 		self._showMain    = True
 		self._processOptions(locals)
@@ -218,6 +210,18 @@ class Site:
 		self._toProcess    = []
 		sys.path.append(self.rootDir)
 
+	def _detectHTMLTidy(tidypath):
+		"""Utility function that looks if HTML tidy is installed"""
+		tidypath = os.path.normpath(tidypath)
+		try:
+			_in, _out, _err = os.popen3("%s -v" % tidypath)
+			if _out.read().strip():
+				return tidypath
+			else:
+				return None
+		except:
+			return None
+
 	def _processOptions( self, options ):
 		if not options: return
 		def has(k):
@@ -232,9 +236,21 @@ class Site:
 		m("accepts", self._accepts)
 		m("ignores", self._ignores)
 		m("indexes", self._indexes)
-		m("tidyconf", "_tidyconf")
-		m("tidyflags", "_tidyflags")
-		if has("USE_TIDY").lower() == "no": self._tidyuse = False
+		m("tidyConf", "_tidyConf")
+		m("tidyflags", "_tidyFlags")
+		for tidy_path in [has("TIDY"), "tidy"]:
+			tidy_path = self._detectHTMLTidy(_tidypath)
+			if tidy_path is not None:
+				self._tidy = tidy_path
+				if self._tidy == "tidy":
+					log("Found tidy in default path")
+				else:
+					log("Found tidy in %s" % self._tidy)
+				break
+		if has("USE_TIDY").lower() == "no" or self._tidy is None: self._tidyEnabled = False
+		if self._tidyEnabled is False:
+			warn("Tidy enables HTML file clean-up and compression but is disabled")
+			warn("See the TIDY and TIDY_USE options or check tidy is your path")
 		if has("CHECKSUM").lower(): self._changeDetectionMethod = CHANGE_CHECKSUM
 		if has("DATE").lower(): self._changeDetectionMethod = CHANGE_DATE
 		if has("CHANGE").lower() == "date": self._changeDetectionMethod = CHANGE_DATE
@@ -242,7 +258,7 @@ class Site:
 		if has("MAIN"): self._main = has("MAIN")
 		if options.get("SHOW_MAIN") is False: self._showMain = False
 		if options.get("SHOW_MAIN") is True: self._showMain  = True
-		else: self._tidyuse = True
+		else: self._tidyEnabled = True
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
@@ -345,7 +361,7 @@ class Site:
 	def useTidy( self ):
 		"""Tells wether this site should use tidy to postprocess HTML
 		templates."""
-		return True
+		return self._tidyEnabled
 	
 	def root( self ):
 		"""Returns the root directory for this site."""
@@ -711,10 +727,10 @@ class SiteBuilder:
 		# post-process it
 		if os.path.splitext(template_outputpath)[1].lower() in (".html", ".htm"):
 			if generate(template, template_outputpath + ".tmp"):
-				if HTMLTIDY and self.site._tidyuse:
+				if self.site.useTidy():
 					flags = ""
-					if self.site._tidyconf:  flags += " -f '%s'" % (self.site._tidyconf)
-					if self.site._tidyflags: flags += " " + self.site._tidyflags
+					if self.site._tidyConf:  flags += " -f '%s'" % (self.site._tidyConf)
+					if self.site._tidyFlags: flags += " " + self.site._tidyFlags
 					_in, _out, _err = os.popen3("%s %s %s > %s" % (
 						self.site._tidy,
 						flags,

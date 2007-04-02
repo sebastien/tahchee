@@ -242,41 +242,41 @@ These options should look like the following.
 There are many configuration options available. Here is the complete list of
 supported options.
 
-    - _URL_ allows you to set the main URL from which your website will be
+    - 'URL' allows you to set the main URL from which your website will be
       accessed. This is useful when you want to generate a website with absolute
       links.
 
-    - _MAIN_ indicates the relative path of the main HTML file for your website.
-      This is usually `index.html`. When _SHOW MAIN_ is set, then the main file
+    - 'MAIN' indicates the relative path of the main HTML file for your website.
+      This is usually `index.html`. When 'SHOW_MAIN' is set, then the main file
       will be displayed in your browser after each build. (new in 0.9.8)
 
-    - _SHOW MAIN_ (can be `True` or `False`), indicate if you want your main
+    - 'SHOW_MAIN' (can be `True` or `False`), indicate if you want your main
       page to be shown in your browser after each build. (new in 0.9.8)
     
-    - _INDEXES_ is a set of "globs" (shell-like patterns) that tell which
+    - 'INDEXES' is a set of "globs" (shell-like patterns) that tell which
       files should be considered as indexes. This also affects link expansion.
     
-    - _IGNORES_ specifies a list of "globs" of files that should be ignored.
+    - 'IGNORES' specifies a list of "globs" of files that should be ignored.
       These files will not be copied or processed. You can also give paths
       relative to the `Pages` directory.
 
-    - _ACCEPTS_ specifies the list of "globs" that will be processed. You should
-      leave this empty, as if you specify one "ACCEPT", then everything not
+    - 'ACCEPTS' specifies the list of "globs" that will be processed. You should
+      leave this empty, as if you specify one 'ACCEPT', then everything not
       accepted will be ignored.
     
-    - _TIDY_ indicates the path to the HTML tidy utility (it is auto-detected
+    - 'TIDY' indicates the path to the HTML tidy utility (it is auto-detected
       otherwise).
 
-    - _USE_TIDY_ (takes `yes` or `no`, yes is the default), indicates if HTML
+    - 'USE_TIDY' (takes `yes` or `no`, yes is the default), indicates if HTML
       tidy should be enabled or not.
 
-    - _TIDYFLAGS_ specifies the flags that should be passed to HTML tidy. You
+    - 'TIDYFLAGS' specifies the flags that should be passed to HTML tidy. You
       can also use an environment variable with the same name.
 
-    - _TIDYCONF_ specifies the configuration file that should be used by HTML
+    - 'TIDYCONF' specifies the configuration file that should be used by HTML
       tidy. You can also use an environment variable with the same name.
 
-    - _CHANGE_ can be set to `date` to detect changes based on the file date and
+    - 'CHANGE' can be set to `date` to detect changes based on the file date and
       `sig` to detect changes based on the signature.
 
 7. Extending Tahchee

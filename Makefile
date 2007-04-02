@@ -43,7 +43,7 @@ DISTROCONTENT   = $(DOCUMENTATION) $(SOURCES) $(SCRIPTS) $(TESTS) $(RESOURCES) \
 
 PACKAGE         = tahchee
 MAIN            = main.py
-MODULES         = tahchee.main tahchee.plugins.linking tahchee.plugins.imaging  tahchee.plugins.markup 
+MODULES         = tahchee.main tahchee.plugins.linking tahchee.plugins.imaging  tahchee.plugins.markup  tahchee.plugins.escape
 
 TEST_MAIN       = $(TESTS)/$(PROJECT)Test.py
 SOURCE_FILES    = $(shell find $(SOURCES) -name "*.py")

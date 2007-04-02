@@ -11,8 +11,7 @@ body {
 	padding: 20pt;
 	padding-top: 10pt;
 	background: rgb(255,255,255);
-	font:  9pt/13pt "Lucida Grande",Lucida,sans-serif;
-	font:  9.5pt/12pt sans-serif;
+	font:  10.5pt/15pt sans-serif;
 	color: rgb(80,80,80);
 }
 
@@ -66,7 +65,7 @@ aimg {
 	color: rgb(177,208,223);
 }
 
-#content {
+.kiwiContent {
 	text-align: left;
 }
 
@@ -82,7 +81,7 @@ aimg {
 	margin-bottom: 0;
 }
 
-#meta {
+.kiwiMeta {
 	width: 100%;
 	padding: 5pt;
 	margin-bottom:  2em;
@@ -90,73 +89,73 @@ aimg {
 	background-color: rgb(250,250,250);
 }
 
-#meta tr td {
+.kiwiMeta tr td {
 	color: rgb(22, 130, 178);
 }
 
-#meta tr td.name {
+.kiwiMeta tr td.name {
 	font-weight: bold;
 }
 
-#content h1, #content h2{
+.kiwiContent h1, .kiwiContent h2{
 	padding-bottom: 5pt;
 	border-bottom:  1px dotted rgb(150, 220, 238);
 }
 
-#content h1 {
+.kiwiContent h1 {
 	font-size: 1.5em;
 	font-weight: normal;
 	padding-top: 1.5em;
 	padding-bottom: 0.5em;
 }
 
-#content h2 {
+.kiwiContent h2 {
 	font-size: 1.3em;
 }
 
-#content h3 {
+.kiwiContent h3 {
 	font-size: 1.1em;
 }
 
-#content pre {
+.kiwiContent pre {
 	padding: 5pt;
-	border-left:  1px solid rgb(150, 220, 238);
+	border:  1px solid rgb(150, 220, 238);
 	padding-left: 20pt;
-	background-color: rgb(250,250,250);
-	font-size: 80%;
+	background-color: rgb(240,240,250);
+	font-size: 8pt;
 	color: rgb(22,130,178);
 }
 
-#content code {
-	font-size: 80%;
-	color: rgb(143, 160, 168);
+.kiwiContent code {
+	font-size: 8pt;
+	background-color: rgb(240,240,250);
 }
 
-#content dt {
+.kiwiContent dt {
 	color: rgb(22,130,178);
 	font-weight: bold;
 }
 
-#content dd {
+.kiwiContent dd {
 	border-left:  1px solid rgb(150, 220, 238);
 	padding-left: 20pt;
 	margin-bottom: 2em;
 }
 
-#content dd pre {
+.kiwiContent dd pre {
 	border-left: 0px;
 }
 
-#content ul li {
+.kiwiContent ul li {
 	padding-bottom: 0.5em;
 }
 
-#content table {
+.kiwiContent table {
 	border:  1px solid rgb(150, 220, 238);
 	padding: 5pt;
 }
 
-#content table caption {
+.kiwiContent table caption {
 	font-family: serif;
 	padding-top: 1em;
 	padding-bottom: 0.5em;
@@ -165,69 +164,68 @@ aimg {
 	color: rgb(22, 130, 178);
 }
 
-#content table tbody {
+.kiwiContent table tbody {
 }
 
-#content table tr {
+.kiwiContent table tr {
 	margin: 0;
 }
 
-#content table tr td {
+.kiwiContent table tr td {
 	margin: 0;
 	padding: 0px;
 	padding-right: 5pt;
 	background-color: rgb(250,250,250);
 }
 
-#content table tr.odd td {
+.kiwiContent table tr.odd td {
 	background-color: rgb(240,240,240);
 }
 
-#content .term {
+.kiwiContent .term {
 	color: rgb(22, 130, 178);
 	background: rgb(240, 250, 256);
 }
 
-#content .quote {
+.kiwiContent .quote {
 	font-style: italic;
 	color: rgb(120, 120, 120);
 }
 
-#content .citation {
+.kiwiContent .citation {
 	font-style: italic;
 	color: rgb(120, 120, 120);
 }
 
-#content div[class^="ann"] {
+.kiwiContent div[class^="ann"] {
 	margin-top: 5pt;
 	margin-bottom: 5pt;
 	padding: 5pt;
 	padding-left: 20pt;
 	color: rgb(100, 100, 100);
-	font-size: 0.8em;
 }
 
-#content div[class^="ann"] .title {
+.kiwiContent div[class^="ann"] .title {
 	font-weight: bold;
 }
 
-#content .annNote {
-	border-left:  1px solid rgb(103,183,0);
+.kiwiContent .annNote {
+	border:  1px solid rgb(103,183,0);
 	margin-top: 5pt;
 	margin-bottom: 5pt;
 	padding: 5pt;
 	padding-left: 20pt;
 	background: #fffbe4;
 	color: rgb(100, 100, 100);
-	font-size: 0.8em;
+	border:  1px solid #dedac3;
 }
 
-#content .annNote .title {
+.kiwiContent .annNote .title {
 	font-weight: bold;
 	display: none;
 }
 
-#references {
+.kiwiReferences {
 	font:  8pt/12pt "Lucida Grande",Lucida,sans-serif;
 	margin-top: 10pt;
 	padding: 5pt;
@@ -236,22 +234,22 @@ aimg {
 	color: rgb(200, 200, 200);
 	font-size: 8pt;
 }
-#references a:link, #references a:active, #references a:visited {
+.kiwiReferences a:link, .kiwiReferences a:active, .kiwiReferences a:visited {
 	color: rgb(150,150,150);
 }
 
-#references .entry {
+.kiwiReferences .entry {
 	padding-top: 5pt;
 	clear: both;
 }
 
-#references .entry .name {
+.kiwiReferences .entry .name {
 	float: left;
 	font-weight: bold;
 	padding-right: 5pt;
 }
 
-#references .entry .content {
+.kiwiReferences .entry .content {
 	text-align: right;
 }
 
@@ -259,11 +257,11 @@ aimg {
 </head>
 <body>
 <div
-	class="title"><h1>Tahchee Manual</h1></div><table id='meta'><tr><td width='0px' class='name'>Author</td><td width='100%' class='value'>Sébastien Pierre</td></tr><tr><td width='0px' class='name'>Version</td><td width='100%' class='value'>0.9.8</td></tr></table>
-<div id='content'><div class="section"><a class="link"><h1 class="heading">Quick setup</h1></a><div class="level1"></div></div><p>At first, you will need a Unix-based machine, or a Windows machine with an available shell (using MinGW or Cygwin), with Python 2.4+ installed.</p><ul><li><a href="http://www.ivy.fr/tahchee">Download Tahchee</a>, and decompress the tarball </li><li>Ensure that <a href="http://www.cheetahtemplate.org">Cheetah</a> (starting from version 0.9.7) is installed </li><li>Optionally install the <a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> (PIL) </li><li>Optionally install <a href="http://www.w3.org/People/Raggett/tidy/">HTML tidy</a></li></ul><p>Once this preliminary setup is done, go into the uncompressed Tahchee directory and do</p><pre>python setup.py install</pre><p>You now have the <code>tahchee</code> command available in your path, and should be ready to start using Tahchee.</p><div class='annNote'><div class='title'>Note</div><div class='content'><p>You can alternatively install Tahchee by copying the <code>tahchee</code> directory within the <code>Sources</code> directory of Tahchee within your Python <code>site-packages</code> directory, and running tahchee with the following command: <code>python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"</code></p></div></div><div class="section"><a class="link"><h1 class="heading">First run</h1></a><div class="level1"></div></div><p>To test your installation, go into Tahchee <code>Documentation/Example</code> directory and type <code>make</code>. The process should run, and output lines similar to those lines:</p><pre>[ ] Mode is 'local', generating in 'Site/Local'
+	class="title"><h1>Tahchee Manual</h1></div><table class='kiwiMeta'><tr><td width='0px' class='name'>Author</td><td width='100%' class='value'>Sébastien Pierre</td></tr><tr><td width='0px' class='name'>Version</td><td width='100%' class='value'>0.9.8</td></tr></table>
+<div class="kiwiContent"><div class='content'><div class="section"><h1 class="heading">Quick setup</h1><div class="level1"></div></div><p>First, you will need a Unix-based machine, or a Windows machine with an available shell (using MinGW or Cygwin), with Python 2.4+ installed.</p><ul><li><a href="http://www.ivy.fr/tahchee">Download Tahchee</a>, and decompress the tarball </li><li>Ensure that <a href="http://www.cheetahtemplate.org">Cheetah</a> (starting from version 0.9.7) is installed </li><li>Optionally install the <a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> (PIL) </li><li>Optionally install <a href="http://www.w3.org/People/Raggett/tidy/">HTML tidy</a></li></ul><p>Once this preliminary setup is done, go into the uncompressed Tahchee directory and do</p><pre>python setup.py install</pre><p>You now have the <code>tahchee</code> command available in your path, and should be ready to start using Tahchee.</p><div class='annNote'><div class='title'>Note</div><div class='content'><p>You can alternatively install Tahchee by copying the <code>tahchee</code> directory within the <code>Sources</code> directory of Tahchee within your Python <code>site-packages</code> directory, and running tahchee with the following command: <code>python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"</code></p></div></div><div class="section"><h1 class="heading">First run</h1><div class="level1"></div></div><p>To test your installation, go into Tahchee <code>Documentation/Example</code> directory and type <code>make</code>. The process should run, and output lines similar to those lines:</p><pre>[ ] Mode is 'local', generating in 'Site/Local'
 [ ] Precompiling template 'Example/Templates/Base'
 [ ] Precompiling template 'Example/Templates/Page'
-[ ] Generating file 'index.html'</pre><p>This process will create the example HTML site in the <code>Site/Local</code> subdirectory. You will find the resulting HTML there. If you want to know what other options are available, type <code>make info</code>.</p><div class="section"><a class="link"><h1 class="heading">How the stuff works</h1></a><div class="level1"></div></div><p>Tahchee is best described as a "website compiler". You design your site with <span class='term'>templates</span>, which contain the common parts between all your pages in your website. Once you wrote your templates, you can start writing <span class='term'>pages</span> which &ldquo;<span class='quote'>fill in the blanks</span>&rdquo; of your templates. The main difference between a template and a page is that a template needs the data provided by a page to render to an HTML (or whatever format) file. In other words, templates are incomplete pages, and pages complete templates.</p><p>To get a better idea of this, let's look at the example data:</p><pre>|-- Pages
+[ ] Generating file 'index.html'</pre><p>This process will create the example HTML site in the <code>Site/Local</code> subdirectory. You will find the resulting HTML there. If you want to know what other options are available, type <code>make info</code>.</p><div class="section"><h1 class="heading">How the stuff works</h1><div class="level1"></div></div><p>Tahchee is best described as a "website compiler". You design your site with <span class='term'>templates</span>, which contain the common parts between all your pages in your website. Once you have written your templates, you can start writing <span class='term'>pages</span> which &ldquo;<span class='quote'>fill in the blanks</span>&rdquo; of your templates. The main difference between a template and a page is that a template needs the data provided by a page to render to an HTML (or whatever format) file. In other words, templates are incomplete pages, and pages complete templates.</p><p>To get a better idea of this, let's look at the example data:</p><pre>|-- Pages
 |   |-- index.html.tmpl
 |   `-- screen.css
 |-- Site
@@ -281,18 +279,18 @@ aimg {
 |   |-- Base.tmpl
 |   |-- Page.py
 |   |-- Page.tmpl
-|   |-- __init__.py</pre><p>We see that the <code>Site/Local</code> was populated with the same content as the <code>Pages</code> directory, excepted files ending in <code>.tmpl</code> were stripped of their extension. Before being stripped of their extensions, the <code>.tmpl</code> files were actually processed with Tahchee to generate the resulting file (which can be HTML, or any other file, such as CSS, PHP, etc).</p><p>There are also some <code>.py</code> files in the <code>Templates</code> directory, which are the result of Cheetah compiling the templates files (<code>.tmpl</code>) in the <code>Templates</code> directory into executable Python code.</p><p>Tahchee works as follows:</p><ul><li>Compiles the <code>tmpl</code> files in the <code>Templates</code> directory </li><li>Compiles the <code>tmpl</code> files in the <code>Pages</code> directory and copies them in the <code>Site/Local</code> subdirectory, stripping them of the <code>tmpl</code> extension </li><li>Copies other files from 'Pages' to the appropriate location in the <code>Site/Local</code> directory.</li></ul><div class="section"><a class="link"><h1 class="heading">More about templates</h1></a><div class="level1"></div></div><p>You can learn the basics of using templates simply by looking at the files in the example. You will see that in our example, we have a template hierarchy:</p><pre>Base
+|   |-- __init__.py</pre><p>We see that the <code>Site/Local</code> was populated with the same content as the <code>Pages</code> directory, excepted files ending in <code>.tmpl</code> were stripped of their extension. Before being stripped of their extensions, the <code>.tmpl</code> files were actually processed with Tahchee to generate the resulting file (which can be HTML, or any other file, such as CSS, PHP, etc).</p><p>There are also some <code>.py</code> files in the <code>Templates</code> directory, which are the result of Cheetah compiling the templates files (<code>.tmpl</code>) in the <code>Templates</code> directory into executable Python code.</p><p>Tahchee works as follows:</p><ul><li>Compiles the <code>tmpl</code> files in the <code>Templates</code> directory </li><li>Compiles the <code>tmpl</code> files in the <code>Pages</code> directory and copies them in the <code>Site/Local</code> subdirectory, stripping them of the <code>tmpl</code> extension </li><li>Copies other files from <code>Pages</code> to the appropriate location in the <code>Site/Local</code> directory.</li></ul><div class="section"><h1 class="heading">More about templates</h1><div class="level1"></div></div><p>You can learn the basics of using templates simply by looking at the files in the example. You will see that in our example, we have a template hierarchy:</p><pre>Base
 `-- Page
     `-- index.html</pre><p>This means that a change in <code>Base</code> will affect <code>Page</code> as well as 'index.html`. By making new templates that "extend" other templates, you can build a whole set of specific templates for your site sections:</p><pre>Base
 `-- Page
     `-- SectionPage
         |-- FAQPage
         |-- UserPage
-        `-- ProjectPage</pre><p>If you look closer at the provided templates, you will see that some variables (like <code>$site</code>) are already available. Tahchee actually provides access to Python object representing the current page and the website as a whole, using the following keywords:</p><ul><li><code>$page</code> refers to the current page, and is a Page object </li><li><code>$site</code> refers to the current site, and is a Site object</li></ul><p>The Page and Site objects are defined in the Tahchee Python API, available with this documentation (see <code>Documentation/tahchee-api.html</code>). For instance, the 'site' object provides a <code>link</code> method that allows to link to a path or URL, and ensure that the link target exists.</p><p>Since Tahchee 0.9.7 a plugin system allows to make additional variables available to templates. This allows you to write your custom Python class and functions, and easily bind them to your templates.</p><div class='annNotes'><div class='title'>Notes</div><div class='content'><p>Starting from Tahchee 0.9.8, you can use extensions like <code>.tmpl.html</code> as well, instead of <code>html.tmpl</code>. This will make it easier for some editors to get the proper syntax highlighting.</p><p>This is however only available to <code>Pages</code>. General templates (those in <code>Templates</code>) have to stay as <code>.tmpl</code>. There are syntax coloring modes for Cheetah templates available in many text editors.</p></div></div><div class="section"><a class="link"><h1 class="heading">Templates and the build process</h1></a><div class="level1"></div></div><p>Templates are "applied" (which means that they generate a file in the <code>Site</code> directory) under a set of conditions:</p><ul><li>They are not filtered out (see <code>ACCEPT</code> and <code>IGNORE</code> in site configuration) </li><li>The template or its parents were modified </li><li>The template was flagged with <code>ALWAYS_REBUILD</code> </li><li>A file state in a <code>DEPENDS</code> directive has changed</li></ul><p>If you want a template to be <b>always applied</b>, you should simply add the following line to the top of your template:</p><pre>## ALWAYS_REBUILD
+        `-- ProjectPage</pre><p>If you look closer at the provided templates, you will see that some variables (like <code>$site</code>) are already available. Tahchee actually provides access to Python object representing the current page and the website as a whole, using the following keywords:</p><ul><li><code>$page</code> refers to the current page, and is a Page object </li><li><code>$site</code> refers to the current site, and is a Site object</li></ul><p>The Page and Site objects are defined in the Tahchee Python API, available with this documentation (see <code>Documentation/tahchee-api.html</code>). For instance, the <code>site</code> object provides a <code>link</code> method that allows to link to a path or URL, and ensure that the link target exists.</p><p>Since Tahchee 0.9.7 a plugin system allows to make additional variables available to templates. This allows you to write your custom Python class and functions, and easily bind them to your templates.</p><div class='annNotes'><div class='title'>Notes</div><div class='content'><p>Starting from Tahchee 0.9.8, you can use extensions like <code>.tmpl.html</code> as well, instead of <code>html.tmpl</code>. This will make it easier for some editors to get the proper syntax highlighting.</p><p>This is however only available to <code>Pages</code>. General templates (those in <code>Templates</code>) have to stay as <code>.tmpl</code>. There are syntax coloring modes for Cheetah templates available in many text editors.</p></div></div><div class="section"><h1 class="heading">Templates and the build process</h1><div class="level1"></div></div><p>Templates are "applied" (which means that they generate a file in the <code>Site</code> directory) under a set of conditions:</p><ul><li>They are not filtered out (see <code>ACCEPT</code> and <code>IGNORE</code> in site configuration) </li><li>The template or its parents were modified </li><li>The template was flagged with <code>ALWAYS_REBUILD</code> </li><li>A file state in a <code>DEPENDS</code> directive has changed</li></ul><p>If you want a template to be <b>always applied</b>, you should simply add the following line to the top of your template:</p><pre>## ALWAYS_REBUILD
 #extends Templates.Page
 ...</pre><p>If you want to state an explicit dependency between your template and another file, simply put its absolute path or path from the template parent directory as follows:</p><pre>## DEPENDS = ../../path/to/my/file.data
 #extends Templates.Page
-...</pre><p>These indications will allow Tahchee to decide when something should be rebuilt or not. In case you would like to do that from the <code>Makefile</code>, you can invoke the <code>build.py</code> script directly with the page you want to rebuild:</p><pre>python build.py Pages/index.html.tmpl</pre><div class="section"><a class="link"><h1 class="heading">Using Kiwi markup</h1></a><div class="level1"></div></div><p>Since version 0.9.7, "Tahchee" comes integrated with the <span class='term'>Kiwi</span> markup language. Kiwi is a simple, expressive text markup language that allows to create XML/HTML documents without actually writing all the HTML tag. For instance</p><pre>Here is a paragraph, followed by a list:
+...</pre><p>These indications will allow Tahchee to decide when something should be rebuilt or not. In case you would like to do that from the <code>Makefile</code>, you can invoke the <code>build.py</code> script directly with the page you want to rebuild:</p><pre>python build.py Pages/index.html.tmpl</pre><div class="section"><h1 class="heading">Using Kiwi markup</h1><div class="level1"></div></div><p>Since version 0.9.7, "Tahchee" comes integrated with the <span class='term'>Kiwi</span> markup language. Kiwi is a simple, expressive text markup language that allows to create XML/HTML documents without actually writing all the HTML tag. For instance</p><pre>Here is a paragraph, followed by a list:
 
 1) The list is numbered
 2) Here is the second item
@@ -304,14 +302,15 @@ aimg {
         &lt;ul&gt;&lt;li&gt;Here is an unnumbered sublist&lt;/li&gt;&lt;/ul&gt;
     &lt;/li&gt;
     &lt;li&gt;And the third item&lt;/li&gt;
-&lt;/ul&gt;</pre><p>Kiwi comes pre-installed with <span class='term'>tahchee</span>. To use it, simply process any of your variable with the <code>$site.kiwi' function. For instance, if your page template
-contains a content section </code><div id='content'>$content</div>' that holds your page content, and that you expect `$content' to contain Kiwi text, simply use the following:</p><pre>&lt;div id="content"&gt;$site.kiwi($content)&lt;/div&gt;</pre><p>This will enable any content to be written in Kiwi. Also, note that with kiwi you can mix HTML (or XML) with Kiwi without any problem, so you can gradually convert your HTML files to Kiwi markup if you need to.</p><p>Kiwi is pretty much similar to <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, but maybe more powerful in some areas. You can learn more about Kiwi <a href="http://www.ivy.fr/kiwi">here</a>.</p><div class="section"><a class="link"><h1 class="heading">Configuration</h1></a><div class="level1"></div></div><p>Tahchee can be configured to meet your specific site setup. All the configuration should be made in the <code>build.py</code> file in your Tahchee website directory, which present you the available options.</p><p>Your website <code>build.py</code> contains a set of options that you can change and edit. These options should look like the following.</p><pre># You can change the following things
+&lt;/ul&gt;</pre><p>Kiwi comes pre-installed with <span class='term'>tahchee</span>. To use it, simply process any of your variable with the <code>$kiwi' function. For instance, if your page template
+contains a content section </code><div id='content'>$content</div><code> that holds your
+page content, and that you expect `$content</code> to contain Kiwi text, simply use the following:</p><pre>&lt;div id="content"&gt;$kiwi($content)&lt;/div&gt;</pre><p>This will enable any content to be written in Kiwi. Also, note that with kiwi you can mix HTML (or XML) with Kiwi without any problem, so you can gradually convert your HTML files to Kiwi markup if you need to.</p><p>Kiwi is pretty much similar to <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, but may be more powerful in some areas. You can learn more about Kiwi <a href="http://www.ivy.fr/kiwi">here</a>.</p><div class="section"><h1 class="heading">Configuration</h1><div class="level1"></div></div><p>Tahchee can be configured to meet your specific site setup. All the configuration should be made in the <code>build.py</code> file in your Tahchee website directory, which present you the available options.</p><p>Your website <code>build.py</code> contains a set of options that you can change and edit. These options should look like the following.</p><pre># You can change the following things
 # =============================================================================
 URL     = "www.ivy.fr/tahchee"
 INDEXES = ["index.*"]
 IGNORES = [".cvs", ".CVS", ".svn", ".DS_Store"]
 ACCEPTS = []
-# =============================================================================</pre><p>There are many configuration options available. Here is the complete list of supported options.</p><ul><li><span class='term'>URL</span> allows you to set the main URL from which your website will be accessed. This is useful when you want to generate a website with absolute links.</li><li><span class='term'>MAIN</span> indicates the relative path of the main HTML file for your website. This is usually <code>index.html</code>. When <span class='term'>SHOW MAIN</span> is set, then the main file will be displayed in your browser after each build. (new in 0.9.8)</li><li><span class='term'>SHOW MAIN</span> (can be <code>True</code> or <code>False</code>), indicate if you want your main page to be shown in your browser after each build. (new in 0.9.8)</li><li><span class='term'>INDEXES</span> is a set of "globs" (shell-like patterns) that tell which files should be considered as indexes. This also affects link expansion.</li><li><span class='term'>IGNORES</span> specifies a list of "globs" of files that should be ignored. These files will not be copied or processed. You can also give paths relative to the <code>Pages</code> directory.</li><li><span class='term'>ACCEPTS</span> specifies the list of "globs" that will be processed. You should leave this empty, as if you specify one "ACCEPT", then everything not accepted will be ignored.</li><li><span class='term'>TIDY</span> indicates the path to the HTML tidy utility (it is auto-detected otherwise).</li><li><span class='term'>USE</span>TIDY_ (takes <code>yes</code> or <code>no</code>, yes is the default), indicates if HTML tidy should be enabled or not.</li><li><span class='term'>TIDYFLAGS</span> specifies the flags that should be passed to HTML tidy. You can also use an environment variable with the same name.</li><li><span class='term'>TIDYCONF</span> specifies the configuration file that should be used by HTML tidy. You can also use an environment variable with the same name.</li><li><span class='term'>CHANGE</span> can be set to <code>date</code> to detect changes based on the file date and <code>sig</code> to detect changes based on the signature.</li></ul><div class="section"><a class="link"><h1 class="heading">Extending Tahchee</h1></a><div class="level1"></div></div><p>Tahchee can be very easily extended using its plugin system (since Tahchee 0.9.7).</p><p>Writing a plugin is very easy:</p><ul><li>Write your Python code independently </li><li>Wrap your classes/functions into a plugin that will make particular objects available to templates as variables (pretty much like the <code>$site</code> object) </li><li>Publish your plugins by putting them within the <code>Plugins</code> directory </li><li>Type <code>tahchee plugins</code> to make sure that your plugin was registered</li></ul><div class="section"><a class="link"><h1 class="heading">Some advices</h1></a><div class="level1"></div></div><p>Tahchee can be very powerful, provided you do things with a little bit of discipline. Here is what I would advice :</p><ul><li>Spend some time thinking about your site map, and the type of pages that you want to have. </li><li>Do not write too many Templates, try to keep them minimal, and make a list of the variables names that will be filled by Pages. </li><li>Do not hesitate to use templates for your CSS files, as it can allow (among other things) to quickly change a set of predefined colors. </li><li>Cheetah templates allow to use any Python module, so do not hesitate to add extra functionality in Python modules that you can put just inside your 'Templates' directory or anywhere in your PYTHONPATH. </li><li>Do not hesitate to write Plugins to provide custom functionalities (automatic generation of pages or linked data)</li></ul><p>I hope this small documentation will help you kickstart using Tahchee, if you have questions or comments, you can contact me at <a href="mailto:&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;">&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;</a>.</p></div>
+# =============================================================================</pre><p>There are many configuration options available. Here is the complete list of supported options.</p><ul><li><code>URL</code> allows you to set the main URL from which your website will be accessed. This is useful when you want to generate a website with absolute links.</li><li><code>MAIN</code> indicates the relative path of the main HTML file for your website. This is usually <code>index.html</code>. When <code>SHOW_MAIN</code> is set, then the main file will be displayed in your browser after each build. (new in 0.9.8)</li><li><code>SHOW_MAIN</code> (can be <code>True</code> or <code>False</code>), indicate if you want your main page to be shown in your browser after each build. (new in 0.9.8)</li><li><code>INDEXES</code> is a set of "globs" (shell-like patterns) that tell which files should be considered as indexes. This also affects link expansion.</li><li><code>IGNORES</code> specifies a list of "globs" of files that should be ignored. These files will not be copied or processed. You can also give paths relative to the <code>Pages</code> directory.</li><li><code>ACCEPTS</code> specifies the list of "globs" that will be processed. You should leave this empty, as if you specify one <code>ACCEPT</code>, then everything not accepted will be ignored.</li><li><code>TIDY</code> indicates the path to the HTML tidy utility (it is auto-detected otherwise).</li><li><code>USE_TIDY</code> (takes <code>yes</code> or <code>no</code>, yes is the default), indicates if HTML tidy should be enabled or not.</li><li><code>TIDYFLAGS</code> specifies the flags that should be passed to HTML tidy. You can also use an environment variable with the same name.</li><li><code>TIDYCONF</code> specifies the configuration file that should be used by HTML tidy. You can also use an environment variable with the same name.</li><li><code>CHANGE</code> can be set to <code>date</code> to detect changes based on the file date and <code>sig</code> to detect changes based on the signature.</li></ul><div class="section"><h1 class="heading">Extending Tahchee</h1><div class="level1"></div></div><p>Tahchee can be very easily extended using its plugin system (since Tahchee 0.9.7).</p><p>Writing a plugin is very easy:</p><ul><li>Write your Python code independently </li><li>Wrap your classes/functions into a plugin that will make particular objects available to templates as variables (pretty much like the <code>$site</code> object) </li><li>Publish your plugins by putting them within the <code>Plugins</code> directory </li><li>Type <code>tahchee plugins</code> to make sure that your plugin was registered</li></ul><p>If you don't want to write plugins, you can alternatively drop some Python modules within the <code>Sources</code> directory of your Tahchee website (you have to create this directory, which is not created by default). Tahchee will then automatically add this directory to the Python path.</p><p>So, if you create a module in <code>Sources/mymodule.py</code>, you can use it in your page templates by doing:</p><pre>#import mymodule</pre><p>and then</p><pre>$mymodule.doSomething()...</pre><p>This is probably the easies way to extend Tahchee functionality.</p><div class="section"><h1 class="heading">Some advices</h1><div class="level1"></div></div><p>Tahchee can be very powerful, provided you do things with a little bit of discipline. Here is what I would advice :</p><ul><li>Spend some time thinking about your site map, and the type of pages that you want to have. </li><li>Do not write too many Templates, try to keep them minimal, and make a list of the variables names that will be filled by Pages. </li><li>Do not hesitate to use templates for your CSS files, as it can allow (among other things) to quickly change a set of predefined colors. </li><li>Cheetah templates allow to use any Python module, so do not hesitate to add extra functionality in Python modules that you can put just inside your <code>Templates</code> directory or anywhere in your PYTHONPATH. </li><li>Do not hesitate to write Plugins to provide custom functionalities (automatic generation of pages or linked data)</li></ul><p>I hope this small documentation will help you kickstart using Tahchee, if you have questions or comments, you can contact me at <a href="mailto:&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;">&#115;&#101;&#98;&#97;&#115;&#116;&#105;&#101;&#110;&#64;&#105;&#118;&#121;&#46;&#102;&#114;</a>.</p></div></div>
 
 </body>
 </html>
