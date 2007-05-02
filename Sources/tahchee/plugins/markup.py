@@ -39,7 +39,7 @@ class KiwiPlugin:
 			_, r = kiwi.run("-m --body-only " + path, noOutput=True)
 			return r
 		else:
-			warn("Kiwi is not available, but you used the $site.kiwi function")
+			self.site.warn("Kiwi is not available, but you used the $site.kiwi function")
 			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
 			return path
 
@@ -53,7 +53,7 @@ class KiwiPlugin:
 			s.close()
 			return r
 		else:
-			warn("Kiwi is not available, but you used the $site.kiwi function")
+			self.site.warn("Kiwi is not available, but you used the $site.kiwi function")
 			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
 			return text
 	

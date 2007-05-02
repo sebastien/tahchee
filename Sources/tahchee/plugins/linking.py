@@ -75,9 +75,10 @@ class LinkingPlugin:
 		os.abspath method, but simply ensures that the path does not starts with
 		'.' and starts with a '/'."""
 		if not path: return "/"
+		path = self._normalize(path)
 		if path[0] == ".": path = path[1:]
 		if not path or not path[0] == "/": path = "/" + path
-		return self._normalize(path)
+		return path
 
 	def a( self, target, content ):
 		return "<a href='%s'>%s</a>" % (target, content)

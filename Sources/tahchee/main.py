@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Encoding: ISO-8859-1
-# vim: tw=80 ts=4 sw=4 fenc=latin-1 noet
+# vim: tw=80 ts=4 sw=4 noet
 # -----------------------------------------------------------------------------
 # Project           :   Tahchee                     <http://www.ivy.fr/tahchee>
 # -----------------------------------------------------------------------------
@@ -10,7 +10,7 @@
 # Contibutors       :   Rafael Villar Burke                 <pachi@rvburke.com>
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   02-Apr-2006
+# Last mod.         :   02-May-2007
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.4, Cheetah
@@ -258,7 +258,8 @@ class Site:
 		if has("MAIN"): self._main = has("MAIN")
 		if options.get("SHOW_MAIN") is False: self._showMain = False
 		if options.get("SHOW_MAIN") is True: self._showMain  = True
-		else: self._tidyEnabled = True
+		if options.get("USE_TIDY"): self._tidyEnabled = True
+		else: self._tidyEnabled = False
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
