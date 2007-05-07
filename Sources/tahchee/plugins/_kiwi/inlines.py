@@ -55,7 +55,7 @@ CODE             = u"`([^\`]+)`"
 RE_CODE          = re.compile(CODE, re.LOCALE|re.MULTILINE)
 CODE_2           = u"``((`?[^`])+)``"
 RE_CODE_2        = re.compile(CODE_2, re.LOCALE|re.MULTILINE)
-CODE_3           = u"'([^\']+)'"
+CODE_3           = u"'([^']+)'"
 RE_CODE_3        = re.compile(CODE_3, re.LOCALE|re.MULTILINE)
 PRE              = u"^((\s*\>(\t|    ))(.*)\n)+"
 RE_PRE           = re.compile(PRE, re.LOCALE|re.MULTILINE)
@@ -119,7 +119,8 @@ def _processText( context, text ):
 
 class InlineParser:
 
-	def __init__( self, name, regexp, result=lambda x,y: x.group(1) ):
+	def __init__( self, name, regexp, result=lambda x,y: x.group(1),
+		requiresLeadingSpace=False):
 		"""Creates a new InlineParser.
 
 		Name is the name of the parser, *regexp* is the string expression
@@ -138,6 +139,15 @@ class InlineParser:
 		else:
 			self.regexp = regexp
 		self.result = result
+		self.requiresLeadingSpace = requiresLeadingSpace
+
+	def _recognisesBefore( self, context, match ):
+		"""A function that is called to check if the text before the current
+		offset is recognized by this parser. This is used by
+		'requiresLeadingSpace'."""
+		if match.start() == 0: return True
+		previous_char = context.currentFragment()[match.start()-1]
+		return previous_char in u' \t();:-!?'
 
 	def recognises( self, context ):
 		"""Recognises this inlines in the given context, within the current
@@ -147,7 +157,11 @@ class InlineParser:
 		method. This means that the returned offset is RELATIVE TO THE CURRENT
 		CONTEXT OFFSET."""
 		match = self.regexp.search(context.currentFragment())
+		fragment = context.currentFragment()
 		if match:
+			match_start = max(0,match.start()-1)
+			if self.requiresLeadingSpace and not self._recognisesBefore(context, match):
+				return (None, None)
 			return (match.start(), match)
 		else:
 			return (None, None)

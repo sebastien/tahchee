@@ -7,7 +7,7 @@
 # Author            :   Sebastien Pierre                 <sebastien@type-z.org>
 # -----------------------------------------------------------------------------
 # Creation date     :   07-Feb-2006
-# Last mod.         :   18-Oct-2006
+# Last mod.         :   02-Apr-2006
 # -----------------------------------------------------------------------------
 
 import re, xml.dom
@@ -70,7 +70,7 @@ $(Header)$(=HEADER)
 </head>
 <body>
 $(Header:title)
-$(Content)
+<div class="kiwiContent">$(Content)</div>
 $(References)
 </body>
 </html>""")
@@ -141,7 +141,7 @@ def convertSection( element ):
 	)
 
 def convertReferences( element ):
-	return process(element, """<div id="references">$(Entry)</div>""")
+	return process(element, """<div class="wikiReferences">$(Entry)</div>""")
 
 def convertEntry( element ):
 	return process(element, """<div class="entry"><div class="name"><a name="%s">%s</a></div><div class="content">$(*)</div></div>""" %
@@ -211,7 +211,7 @@ def convertlink( element ):
 		(element.getAttributeNS(None, "target")))
 
 def convertMeta( element ):
-	return process(element, "<table id='meta'>$(*)</table>")
+	return process(element, "<table class='kiwiMeta'>$(*)</table>")
 
 def convertmeta( element ):
 	return process(element,
@@ -240,9 +240,6 @@ def convertquote( element ):
 def convertcitation( element ):
 	return process(element, """&laquo;<span class='citation'>$(*)</span>&raquo;""")
 
-def convertemphasis( element ):
-	return process(element, """<b>$(*)</b>""")
-
 def convertstrong( element ):
 	return process(element, """<strong>$(*)</strong>""")
 
@@ -253,7 +250,7 @@ def convertcode( element ):
 	return process(element, """<code>$(*)</code>""")
 
 def convertemphasis( element ):
-	return process(element, """<b>$(*)</b>""")
+	return process(element, """<em>$(*)</em>""")
 
 def convertbreak( element ):
 	return process(element, """<br />""")

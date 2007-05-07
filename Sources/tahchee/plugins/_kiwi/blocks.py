@@ -9,7 +9,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   27-Jul-2006
+# Last mod.         :   02-May-2007
 # -----------------------------------------------------------------------------
 
 import re, string
@@ -40,15 +40,15 @@ RE_TITLES         = re.compile(u"%s|%s" % (TITLE, TITLE_HEADER), re.LOCALE|re.MU
 
 SECTION_HEADING   = u"^\s*((([0-9]+|[A-z])\.)+([0-9]+|[A-z])?\.?)"
 RE_SECTION_HEADING= re.compile(SECTION_HEADING, re.LOCALE)
-SECTION_UNDERLINE = u"^\s*[\*\-\=#][\*\-\=#][\*\-\=#][\*\-\=#]+\s*$"
+SECTION_UNDERLINE = u"^\s*[\*\-\=#][\*\-\=#][\*\-\=#]+\s*$"
 RE_SECTION_UNDERLINE = re.compile(SECTION_UNDERLINE, re.LOCALE|re.MULTILINE)
 
-DEFINITION_ITEM   = u"^\s*((\:[^\:]|[^\:])+)\:\:+\s*(\n+\s*|\s*\|\s*\n)*"
+DEFINITION_ITEM   = u"^(\s*(\:[^\:]|[^\:])+)\:\:+\s*(\n+\s*|\s*\|\s*\n)*"
 RE_DEFINITION_ITEM = re.compile(DEFINITION_ITEM, re.LOCALE|re.MULTILINE)
 
 TAGGED_BLOCK      = u"^\s*(([^_]+\s*)(\:[^_]+)?)?(____+)\s*$"
 RE_TAGGED_BLOCK   = re.compile(TAGGED_BLOCK, re.MULTILINE | re.LOCALE)
-LIST_ITEM         = u"^(\s*)(-|\*\)|[0-9A-z][\)/\.])\s*"
+LIST_ITEM         = u"^(\s*)(-|\*\)|[0-9A-z][\)/])\s*"
 RE_LIST_ITEM      = re.compile(LIST_ITEM, re.MULTILINE | re.LOCALE)
 LIST_HEADING      = u"(^\s*[^:{().<]*:)"
 RE_LIST_HEADING   = re.compile(LIST_HEADING, re.MULTILINE | re.LOCALE)

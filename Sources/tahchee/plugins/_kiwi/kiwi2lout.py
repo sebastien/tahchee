@@ -191,9 +191,6 @@ def convertpre( element ):
 def convertcode( element ):
 	return process(element, """<code>$(*)</code>""")
 
-def convertemphasis( element ):
-	return process(element, """<b>$(*)</b>""")
-
 def convertbreak( element ):
 	return process(element, """<br />""")
 
