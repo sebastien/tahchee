@@ -394,7 +394,7 @@ def Markup_attributes( match ):
 	if text and text[-1] == "/": text = text[:-1]
 	text = text.strip()
 	return text
-	
+
 class MarkupInlineParser( InlineParser ):
 	"""Parses Kiwi generic markup elements."""
 
@@ -426,7 +426,7 @@ class MarkupInlineParser( InlineParser ):
 				context.parser.error( START_WITHOUT_END % (markup_name), context )
 				return match.end()
 			else:
-				markup_end   = markup_range[0]
+				markup_end   = markup_range[0] + context.getOffset()
 				# We do not want the context to be altered by block parsing
 				offsets = context.saveOffsets()
 				context.setCurrentBlock(context.getOffset()+match.end(),
@@ -510,8 +510,8 @@ class MarkupInlineParser( InlineParser ):
 
 	def findEnd( self, blockName, context, offsetIncr=0 ):
 		"""Finds the end of the given markup end in the current block. Returns
-		a coupe (start, end) indicating the start and end offsets of the found
-		end block, relative to the context offset. The given offsetInc
+		a couple (start, end) indicating the start and end offsets of the found
+		end block, relative to the context offset. The given 'offsetIncr'
 		parameter tells the number of characters to skip before searching for
 		the end markup. This has no impact on the result.
 

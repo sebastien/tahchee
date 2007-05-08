@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   27-Mar-2007
+# Last mod.         :   07-May-2007
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -17,7 +17,7 @@ __doc__ = """Kiwi is an advanced markup text processor, which can be used as
 an embedded processor in any application. It is fast, extensible and outputs an
 XML DOM."""
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 __pychecker__ = "blacklist=cDomlette,cDomlettec"
 
 import re, string, operator, getopt, codecs
@@ -274,13 +274,15 @@ def run( arguments, input = None, noOutput=False ):
 		#MiniDom:
 		result = xml_document.toxml().encode(output_enc)
 		if not noOutput: ofile.write(result)
-
 	return (SUCCESS, result)
 
-def text2htmlbody( text ):
+def text2htmlbody( text, inputEncoding=None, outputEncoding=None ):
 	"""Converts the given text to HTML, returning only the body."""
 	s = StringIO.StringIO(text)
-	_, text = run("-m --body-only --", s, noOutput=True)
+	command = "-m --body-only"
+	if inputEncoding: command += " -i " + inputEncoding
+	if outputEncoding: command += " -o " + outputEncoding
+	_, text = run(command + " --", s, noOutput=True)
 	s.close()
 	return text
 

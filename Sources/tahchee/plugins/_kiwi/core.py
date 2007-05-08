@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   07-Fev-2006
-# Last mod.         :   21-Mar-2007
+# Last mod.         :   07-May-2007
 # -----------------------------------------------------------------------------
 
 import os, sys
@@ -413,6 +413,8 @@ class Parser:
 			self._parseNextBlock(context)
 
 	def _parseNextBlock( self, context, end=None ):
+		"""Parses the block identified in the given context, ending at the given
+		'end' (if 'end' is not None)."""
 		assert context!=None
 		# This variable indicates if at least one block parser recognised the
 		# current block
@@ -421,15 +423,17 @@ class Parser:
 		block_start_offset = context.getOffset()
 		block_end_offset, next_block_start_offset = \
 			self._findNextBlockSeparator(context)
+		# If we specify the end
+		if end != None:
+			block_end_offset = min(end, block_end_offset)
 		# If the block is an empty block (a SEPARATOR), we try to find the
 		# parent node
-		if end != None: block_end_offset = min(end, block_end_offset)
 		if block_end_offset == block_start_offset:
 			# We rewind until we find a "Content" block
 			while context.currentNode.nodeName != "Content" and \
 			context.currentNode.parentNode != None:
 				context.currentNode = context.currentNode.parentNode
-		# Otherwise
+		# Otherwise we set the current block and process it
 		else:
 			context.setCurrentBlock(block_start_offset, block_end_offset)
 			assert block_start_offset < block_end_offset <= next_block_start_offset
@@ -556,11 +560,9 @@ class Parser:
 					# If there was not markup end, we skip the markup inline
 					else:
 						local_offset = markup_match.end()
-
 				# We have a single tag, so we simply increase the offset
 				else:
 					local_offset = markup_match.end()
-
 			# We have found a block with no nested markup
 			return (block_match.start(), block_match.end())
 		# There was no block separator, so we reached the document end
