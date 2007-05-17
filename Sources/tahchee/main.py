@@ -267,7 +267,7 @@ class Site:
 		inputPath  = os.path.abspath(inputPath)
 		if outputPath: outputPath = os.path.abspath(outputPath)
 		self._toProcess.append((inputPath, outputPath, force))
-	
+
 	def nextToProcess( self ):
 		"""Returns a triple (inputpath, outputpath, force) that indicates the
 		next file that should be processed by the builder. This is an iteration
@@ -276,7 +276,7 @@ class Site:
 		res = self._toProcess[0]
 		self._toProcess = self._toProcess[1:]
 		return res
-	
+
 	def hasToProcess( self ):
 		"""Tells if there are remaining files to be processed."""
 		return len(self._toProcess) > 0
@@ -290,11 +290,11 @@ class Site:
 		"""The given globs idenitfy files that won't be accepted by this
 		site."""
 		self._ignores.extend(args)
-	
+
 	def index( self, *args ):
 		"""Tells that the given globs match index files."""
 		self._indexes.extend(args)
-	
+
 	def isIndex( self, path ):
 		"""Tells wether the given path corresponds to an index or not."""
 		path = os.path.basename(path)
@@ -531,7 +531,7 @@ class SiteBuilder:
 		root."""
 		path = os.path.join(self.site.root(), "site.checksums")
 		fd = open(path, "w")
-		pickle.dump(self.checksums, fd)
+		pickle.dump(self.checksums, fd, pickle.HIGHEST_PROTOCOL)
 		fd.close()
 
 	def loadChecksums(self):
