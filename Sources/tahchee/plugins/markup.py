@@ -40,7 +40,7 @@ class KiwiPlugin:
 			return r
 		else:
 			self.site.warn("Kiwi is not available, but you used the $site.kiwi function")
-			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
+			self.site.info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
 			return path
 
 	def process( self, text, level=0 ):
@@ -48,10 +48,14 @@ class KiwiPlugin:
 		markup and HTML will be generated from it. If Kiwi is not available, a
 		warning will be issued, and the text will be displayed as-is."""
 		if kiwi:
-			s = StringIO.StringIO(text)
-			_, r = kiwi.run("-m --body-only --level=%s --" % (level), s, noOutput=True)
-			s.close()
-			return r
+            try:
+    			s = StringIO.StringIO(text)
+	    		_, r = kiwi.run("-m --body-only --level=%s --" % (level), s, noOutput=True)
+		    	s.close()
+			    return r
+            except:
+                self.site.error("Can't process kiwi markup in file %s" % self.site.page)
+                raise
 		else:
 			self.site.warn("Kiwi is not available, but you used the $site.kiwi function")
 			info("You can get Kiwi from <http://www.ivy.fr/kiwi>")
