@@ -9,10 +9,10 @@
 First, you will need a Unix-based machine, or a Windows machine with an
 available shell (using MinGW or Cygwin), with Python 2.4+ installed.
 
-    1. [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
-    2. Ensure that [Cheetah](http://www.cheetahtemplate.org) (starting from version 0.9.7) is installed
-    3. Optionally install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
-    4. Optionally install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
+    1) [Download Tahchee](http://www.ivy.fr/tahchee), and decompress the tarball
+    2) Ensure that [Cheetah](http://www.cheetahtemplate.org) (starting from version 0.9.7) is installed
+    3) Optionally install the [Python Imaging Library](http://www.pythonware.com/products/pil/) (PIL)
+    4) Optionally install [HTML tidy](http://www.w3.org/People/Raggett/tidy/)
 
 Once this preliminary setup is done, go into the uncompressed Tahchee directory
 and do
@@ -94,10 +94,10 @@ directory into executable Python code.
 
 Tahchee works as follows:
 
-    1. Compiles the `tmpl` files in the `Templates` directory
-    2. Compiles the `tmpl` files in the `Pages` directory and copies them in
+    1) Compiles the `tmpl` files in the `Templates` directory
+    2) Compiles the `tmpl` files in the `Pages` directory and copies them in
     the `Site/Local` subdirectory, stripping them of the `tmpl` extension
-    3. Copies other files from 'Pages' to the appropriate location in the
+    3) Copies other files from 'Pages' to the appropriate location in the
     `Site/Local` directory.
 
 4. More about templates
