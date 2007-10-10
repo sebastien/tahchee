@@ -159,6 +159,20 @@ class Page:
 		"""This is the relative or absolute URL of the page."""
 		return self._url
 
+	def htmlPath( self, sep="/" ):
+		"""Returns an HTML string with links for the whole page path"""
+		components = self.path().split("/")
+		res        = []
+		for c in components:
+			link = "<a href='%s'>%s</a>" % (
+				"/".join(components[:len(c)-1]),
+				os.path.splitext(c)[0]
+			)
+			res.append("<span class='component'>%s</span>" % (link))
+		return "<span class='location'>%s</span>" % (
+			("<span class='sep'>%s</span>" % (sep)).join(res)
+		)
+
 #------------------------------------------------------------------------------
 #
 #  Site Class
@@ -247,10 +261,8 @@ class Site:
 				else:
 					log("Found tidy in %s" % self._tidy)
 				break
-		if has("USE_TIDY").lower() == "no" or self._tidy is None: self._tidyEnabled = False
-		if self._tidyEnabled is False:
-			warn("Tidy enables HTML file clean-up and compression but is disabled")
-			warn("See the TIDY and TIDY_USE options or check tidy is your path")
+		if has("USE_TIDY").lower() == "no" or not self._tidy:
+			self._tidyEnabled = False
 		if has("CHECKSUM").lower(): self._changeDetectionMethod = CHANGE_CHECKSUM
 		if has("DATE").lower(): self._changeDetectionMethod = CHANGE_DATE
 		if has("CHANGE").lower() == "date": self._changeDetectionMethod = CHANGE_DATE
@@ -258,8 +270,10 @@ class Site:
 		if has("MAIN"): self._main = has("MAIN")
 		if options.get("SHOW_MAIN") is False: self._showMain = False
 		if options.get("SHOW_MAIN") is True: self._showMain  = True
-		if options.get("USE_TIDY"): self._tidyEnabled = True
-		else: self._tidyEnabled = False
+		if self._tidyEnabled is False:
+			warn("Tidy enables HTML file clean-up and compression but is disabled")
+			warn("See the TIDY and TIDY_USE options or check tidy is your path")
+
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
