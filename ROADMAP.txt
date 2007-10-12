@@ -1,0 +1,17 @@
+== Kiwi Roadmap
+
+Version 1.1::
+
+	[ ] Support for other template systems as plugins
+	[ ] Automatic post-generation link list and checking
+	[ ] Internationalization support
+
+Version 1.0::
+
+	[ ] Docs: Completely up-to-date manual
+	[ ] Fully working 'setup.py'
+	[X] Plugins: ReST support
+	[X] 'Sources' directory can be used for specific modules
+
+# EOF
+
