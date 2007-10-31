@@ -243,6 +243,15 @@ and do:
 
 >   $rest($rest_text)
 
+In case you have encoding problems, the 'rest' function takes the following
+paramaters:
+
+>   rest(text,encoding,outputEncoding)
+
+So you can specify the _input encoding_ ('encoding') and _output encoding_
+('outputEncoding'), which should be given as a strings (like 'utf-8', 'latin-1',
+'ascii', etc)
+
 6. Configuration
 ================
 
