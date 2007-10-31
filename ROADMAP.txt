@@ -1,10 +1,20 @@
 == Kiwi Roadmap
 
+Version 1.3::
+
+	[ ] Automatic post-generation link list and checking
+
+Version 1.2::
+
+	[ ] Sitemap support (links can be valid even if there is no local file)
+	[ ] Remove makefile (replace by Python script)
+	[ ] Improve HTML tidy error reporting
+
 Version 1.1::
 
 	[ ] Support for other template systems as plugins
-	[ ] Automatic post-generation link list and checking
 	[ ] Internationalization support
+	[ ] Integration of ''extras'' (ready-to-use configurations)
 
 Version 1.0::
 
