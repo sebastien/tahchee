@@ -3,10 +3,11 @@
 # Project           :   Tahchee                      <http://www.ivy.fr/tachee>
 # -----------------------------------------------------------------------------
 # Author            :   Joerg Zinke                           <umaxx@oleco.net>
+#                       Sebastien Pierre                      <sebastien@ivy.fr>
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   29-Jan-2007
-# Last mod.         :   29-Jan-2007
+# Last mod.         :   31-Oct-2007
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -22,6 +23,9 @@ SUMMARY = "reStructuredText to HTML conversion functions."
 
 class RestPlugin:
 
+	DEFAULT_ENCODING = "iso-8859-1"
+	DEFAULT_OUTPUT_ENCODING = "iso-8859-1"
+
 	def __init__( self, site ):
 		self.site = site
 
@@ -34,8 +38,8 @@ class RestPlugin:
 		localdict["rest"] = self
 
 	def __html_body(self, input_string, source_path=None, destination_path=None,
-				  input_encoding='unicode', output_encoding='unicode',
-				  doctitle=1, initial_header_level=1):
+				input_encoding='unicode', output_encoding='unicode',
+				doctitle=1, initial_header_level=1):
 		"""
 		Given an input string, returns an HTML fragment as a string.
 
@@ -61,9 +65,11 @@ class RestPlugin:
 		- `output_encoding`: The desired encoding of the output.  If a Unicode
 		  string is desired, use the default value of "unicode" .
 		"""
-		overrides = {'input_encoding': input_encoding,
-					 'doctitle_xform': doctitle,
-					 'initial_header_level': initial_header_level}
+		overrides = {
+			'input_encoding': input_encoding,
+			'doctitle_xform': doctitle,
+			'initial_header_level': initial_header_level
+		}
 		parts = core.publish_parts(
 			source=input_string, source_path=source_path,
 			destination_path=destination_path,
@@ -73,29 +79,33 @@ class RestPlugin:
 			fragment = fragment.encode(output_encoding)
 		return fragment
 
-	def include(self, path):
+	def include(self, path, encoding=None):
+		encoding = encoding or self.DEFAULT_ENCODING
+		outputEncoding = outputEncoding or self.DEFAULT_OUTPUT_ENCODING
 		if not path[0] == "/":
 			path = self.site.pagesDir + "/" + path
-			r = self.__html_body(input_string=unicode(text, 'utf-8'), source_path=path, output_encoding='ascii')
+			r = self.__html_body(input_string=unicode(text, encoding), source_path=path, output_encoding=outputEncoding)
 			return r
 		else:
 			self.site.warn("Docutils are not available, but you used the $site.rest function")
 			self.site.info("You can get Docutils from <http://docutils.sourceforge.net/>")
 			return path
 
-	def process(self, text):
+	def process(self, text, encoding=None, outputEncoding=None):
 		"""If docutils are available, the given text will be interpreted as rest
 		markup and HTML will be generated from it. If docutils are not available, a
 		warning will be issued, and the text will be displayed as-is."""
+		encoding = encoding or self.DEFAULT_ENCODING
+		outputEncoding = outputEncoding or self.DEFAULT_OUTPUT_ENCODING
 		if core and io:
-			r = self.__html_body(input_string=unicode(text, 'utf-8'), output_encoding='ascii')
+			r = self.__html_body(input_string=unicode(text, encoding), output_encoding=outputEncoding)
 			return r
 		else:
 			self.site.warn("Docutils are not available, but you used the $site.rest function")
 			self.site.info("You can get Docutils from <http://docutils.sourceforge.net/>")
 			return text
 
-	def __call__(self, text):
-		return self.process(text)
+	def __call__(self, text, encoding=None):
+		return self.process(text, encoding)
 
 # EOF

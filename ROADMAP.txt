@@ -15,6 +15,7 @@ Version 1.1::
 	[ ] Support for other template systems as plugins
 	[ ] Internationalization support
 	[ ] Integration of ''extras'' (ready-to-use configurations)
+	[ ] Rename tahchee create to init
 
 Version 1.0::
 
