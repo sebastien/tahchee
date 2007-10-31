@@ -180,8 +180,12 @@ the `build.py` script directly with the page you want to rebuild:
 
 >   python build.py Pages/index.html.tmpl
 
-5. Using Kiwi markup
-====================
+5. Plugins
+==========
+
+
+Kiwi Markup
+-----------
 
 Since version 0.9.7, "Tahchee" comes integrated with the _Kiwi_ markup language.
 Kiwi is a simple, expressive text markup language that allows to create XML/HTML
@@ -220,6 +224,24 @@ gradually convert your HTML files to Kiwi markup if you need to.
 Kiwi is pretty much similar to [Markdown](http://daringfireball.net/projects/markdown/),
 but may be more powerful in some areas. You can learn more about
 Kiwi [here](http://www.ivy.fr/kiwi).
+
+ReStructuredText Markup
+-----------------------
+
+In addition to Kiwi markup, Tahchee also supports [Rest](http://docutils.sf.net/rst)
+markup. To use Rest markup in one of your templates, simply do:
+
+>      $rest("some rest **text**")
+
+if you prefer, you can also refer to a variable defined elsewhere:
+
+>   #def rest_text
+>   Hello, I am a rest text
+>   #end
+
+and do:
+
+>   $rest($rest_text)
 
 6. Configuration
 ================
