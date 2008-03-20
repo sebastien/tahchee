@@ -20,7 +20,7 @@ DESCRIPTION = """\
 Tahchee is a tool for developers and Web designers that makes it possible to
 easily build a static Web site using the Cheetah template system. It is used to
 fill in the gap between bare template and macro processing system and dynamic
-template-based Web sites. It acts both as a build system (à la "make") as well
+template-based Web sites. It acts both as a build system (a la "make") as well
 as an extension to the Cheetah template that makes it really easy to build small
 to medium-sized sites. It is ideal for writing open source project or small
 company Web sites.\

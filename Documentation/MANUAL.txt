@@ -23,7 +23,6 @@ You now have the `tahchee` command available in your path, and should be ready
 to start using Tahchee.
 
     Note ______________________________________________________________________
-
     You can alternatively install Tahchee by copying the `tahchee` directory within the
     `Sources` directory of Tahchee within your Python `site-packages` directory,
     and running tahchee with the following command:

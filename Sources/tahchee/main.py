@@ -423,8 +423,10 @@ class Site:
 
 	def log(self,msg): log(msg)
 	def err(self,msg): err(msg)
+	def error(self,msg): err(msg)
 	def info(self,msg): info(msg)
 	def warn(self,msg): warn(msg)
+	def warning(self,msg): warn(msg)
 	def fatal(self,msg): fatal(msg)
 
 #------------------------------------------------------------------------------
