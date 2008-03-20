@@ -55,8 +55,11 @@ that a template needs the data provided by a page to render to an HTML (or
 whatever format) file. In other words, templates are incomplete pages, and pages
 complete templates.
 
-To get a better idea of this, let's look at the example data:
+To get a better idea of this, let's look at a subset of the example data (I've
+omitted some files which are not relevant in our explanation):
 
+>   |-- build.py
+>   |-- Makefile
 >   |-- Pages
 >   |   |-- index.html.tmpl
 >   |   `-- screen.css
@@ -67,19 +70,23 @@ To get a better idea of this, let's look at the example data:
 
 Running `make` will populate your website project directory:
 
+
+>   |-- build.py
+>   |-- Makefile
+>   |-- site.checksums            (created by build.py)
 >   |-- Pages
 >   |   |-- index.html.tmpl
 >   |   `-- screen.css
 >   |-- Site
 >   |   `-- Local                 (this is the directory created by tahchee)
 >   |       |-- index.html
+>   |       |-- restpage.html
 >   |       `-- screen.css
 >   |-- Templates
 >   |   |-- Base.py               (these are 'compiled' versions of your templates)
 >   |   |-- Base.tmpl
 >   |   |-- Page.py
 >   |   |-- Page.tmpl
->   |   |-- __init__.py
 
 We see that the `Site/Local` was populated with the same content as the `Pages`
 directory, excepted files ending in `.tmpl` were stripped of their extension. Before

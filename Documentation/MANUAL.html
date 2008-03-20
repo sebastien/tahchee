@@ -305,25 +305,31 @@ aimg {
     <code>python -c "import sys, tahchee.main ; tahchee.main.run(sys.argv[1:])"</code></div></div></div></div><div class="section" level="1"><h1 class="heading"><span class="number"><span class="level0">2<span class="lastDot dot">.</span></span></span>First run</h1><div class="level1"><p>To test your installation, go into Tahchee <code>Documentation/Example</code> directory and type <code>make</code>. The process should run, and output lines similar to those lines:</p><pre>[ ] Mode is 'local', generating in 'Site/Local'
 [ ] Precompiling template 'Example/Templates/Base'
 [ ] Precompiling template 'Example/Templates/Page'
-[ ] Generating file 'index.html'</pre><p>This process will create the example HTML site in the <code>Site/Local</code> subdirectory. You will find the resulting HTML there. If you want to know what other options are available, type <code>make info</code>.</p></div></div><div class="section" level="1"><h1 class="heading"><span class="number"><span class="level0">3<span class="lastDot dot">.</span></span></span>How the stuff works</h1><div class="level1"><p>Tahchee is best described as a "website compiler". You design your site with <span class='term'>templates</span>, which contain the common parts between all your pages in your website. Once you have written your templates, you can start writing <span class='term'>pages</span> which &ldquo;<span class='quote'>fill in the blanks</span>&rdquo; of your templates. The main difference between a template and a page is that a template needs the data provided by a page to render to an HTML (or whatever format) file. In other words, templates are incomplete pages, and pages complete templates.</p><p>To get a better idea of this, let's look at the example data:</p><pre>|-- Pages
+[ ] Generating file 'index.html'</pre><p>This process will create the example HTML site in the <code>Site/Local</code> subdirectory. You will find the resulting HTML there. If you want to know what other options are available, type <code>make info</code>.</p></div></div><div class="section" level="1"><h1 class="heading"><span class="number"><span class="level0">3<span class="lastDot dot">.</span></span></span>How the stuff works</h1><div class="level1"><p>Tahchee is best described as a "website compiler". You design your site with <span class='term'>templates</span>, which contain the common parts between all your pages in your website. Once you have written your templates, you can start writing <span class='term'>pages</span> which &ldquo;<span class='quote'>fill in the blanks</span>&rdquo; of your templates. The main difference between a template and a page is that a template needs the data provided by a page to render to an HTML (or whatever format) file. In other words, templates are incomplete pages, and pages complete templates.</p><p>To get a better idea of this, let's look at a subset of the example data (I've omitted some files which are not relevant in our explanation):</p><pre>|-- build.py
+|-- Makefile
+|-- Pages
 |   |-- index.html.tmpl
 |   `-- screen.css
 |-- Site
 |-- Templates
 |   |-- Base.tmpl
-|   `-- Page.tmpl</pre><p>Running <code>make</code> will populate your website project directory:</p><pre>|-- Pages
+|   `-- Page.tmpl</pre><p>Running <code>make</code> will populate your website project directory:</p><pre>
+|-- build.py
+|-- Makefile
+|-- site.checksums            (created by build.py)
+|-- Pages
 |   |-- index.html.tmpl
 |   `-- screen.css
 |-- Site
 |   `-- Local                 (this is the directory created by tahchee)
 |       |-- index.html
+|       |-- restpage.html
 |       `-- screen.css
 |-- Templates
 |   |-- Base.py               (these are 'compiled' versions of your templates)
 |   |-- Base.tmpl
 |   |-- Page.py
-|   |-- Page.tmpl
-|   |-- __init__.py</pre><p>We see that the <code>Site/Local</code> was populated with the same content as the <code>Pages</code> directory, excepted files ending in <code>.tmpl</code> were stripped of their extension. Before being stripped of their extensions, the <code>.tmpl</code> files were actually processed with Tahchee to generate the resulting file (which can be HTML, or any other file, such as CSS, PHP, etc).</p><p>There are also some <code>.py</code> files in the <code>Templates</code> directory, which are the result of Cheetah compiling the templates files (<code>.tmpl</code>) in the <code>Templates</code> directory into executable Python code.</p><p>Tahchee works as follows:</p><ul><li>Compiles the <code>tmpl</code> files in the <code>Templates</code> directory </li><li>Compiles the <code>tmpl</code> files in the <code>Pages</code> directory and copies them in the <code>Site/Local</code> subdirectory, stripping them of the <code>tmpl</code> extension </li><li>Copies other files from <code>Pages</code> to the appropriate location in the <code>Site/Local</code> directory.</li></ul></div></div><div class="section" level="1"><h1 class="heading"><span class="number"><span class="level0">4<span class="lastDot dot">.</span></span></span>More about templates</h1><div class="level1"><p>You can learn the basics of using templates simply by looking at the files in the example. You will see that in our example, we have a template hierarchy:</p><pre>Base
+|   |-- Page.tmpl</pre><p>We see that the <code>Site/Local</code> was populated with the same content as the <code>Pages</code> directory, excepted files ending in <code>.tmpl</code> were stripped of their extension. Before being stripped of their extensions, the <code>.tmpl</code> files were actually processed with Tahchee to generate the resulting file (which can be HTML, or any other file, such as CSS, PHP, etc).</p><p>There are also some <code>.py</code> files in the <code>Templates</code> directory, which are the result of Cheetah compiling the templates files (<code>.tmpl</code>) in the <code>Templates</code> directory into executable Python code.</p><p>Tahchee works as follows:</p><ul><li>Compiles the <code>tmpl</code> files in the <code>Templates</code> directory </li><li>Compiles the <code>tmpl</code> files in the <code>Pages</code> directory and copies them in the <code>Site/Local</code> subdirectory, stripping them of the <code>tmpl</code> extension </li><li>Copies other files from <code>Pages</code> to the appropriate location in the <code>Site/Local</code> directory.</li></ul></div></div><div class="section" level="1"><h1 class="heading"><span class="number"><span class="level0">4<span class="lastDot dot">.</span></span></span>More about templates</h1><div class="level1"><p>You can learn the basics of using templates simply by looking at the files in the example. You will see that in our example, we have a template hierarchy:</p><pre>Base
 `-- Page
     `-- index.html</pre><p>This means that a change in <code>Base</code> will affect <code>Page</code> as well as 'index.html`. By making new templates that "extend" other templates, you can build a whole set of specific templates for your site sections:</p><pre>Base
 `-- Page
