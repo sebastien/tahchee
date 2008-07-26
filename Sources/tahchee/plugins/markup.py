@@ -6,7 +6,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   23-Mar-2006
-# Last mod.         :   13-Jun-2007
+# Last mod.         :   26-Jul-2008
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -35,6 +35,8 @@ class KiwiPlugin:
 	def include( self, path ):
 		if not path[0] == "/":
 			path = self.site.pagesDir + "/" + path
+		if not os.path.exists(path):
+			self.site.error("Included file not found: "+ path)
 		if kiwi:
 			_, r = kiwi.run("-m --body-only " + path, noOutput=True)
 			return r
