@@ -10,13 +10,13 @@
 # Contibutors       :   Rafael Villar Burke                 <pachi@rvburke.com>
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   02-May-2007
+# Last mod.         :   11-Sep-2009
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.4, Cheetah
 # Recommends: PIL, HTML Tidy
 
-__version__ = "0.9.8"
+__version__ = "0.9.9"
 
 def version(): return __version__
 
@@ -148,7 +148,7 @@ class Page:
 	
 	def name( self ):
 		"""Returns this page name (the filename without the directory name)"""
-		return self.name
+		return self._name
 	
 	def path( self ):
 		"""Returns the path to this page. The path is relative to the site
@@ -261,7 +261,7 @@ class Site:
 				else:
 					log("Found tidy in %s" % self._tidy)
 				break
-		if has("USE_TIDY").lower() == "no" or not self._tidy:
+		if has("USE_TIDY").lower() == "no" or not has("USE_TIDY") or not self._tidy:
 			self._tidyEnabled = False
 		if has("CHECKSUM").lower(): self._changeDetectionMethod = CHANGE_CHECKSUM
 		if has("DATE").lower(): self._changeDetectionMethod = CHANGE_DATE
@@ -273,7 +273,6 @@ class Site:
 		if self._tidyEnabled is False:
 			warn("Tidy enables HTML file clean-up and compression but is disabled")
 			warn("See the TIDY and TIDY_USE options or check tidy is your path")
-
 
 	def willProcess( self, inputPath, outputPath=None, force=False ):
 		"""Registers the given file to be processed by the SiteBuilder when
@@ -761,14 +760,14 @@ class SiteBuilder:
 					# summary  = errors[-10]
 					# print "SU???", summary
 					# warnings, errors = summary.split(",")
-					# warnings = int(warnings.strip().split()[0])
+					# warnings = int(warnings.strip().split()[0])
 					# errors   = int(errors.strip().split()[0])
-					# if errors > 0:
-					# 	# If there was a failure, we do not create the file
-					# 	os.unlink(template_outputpath)
+					# if errors > 0:
+					# 	# If there was a failure, we do not create the file
+					# 	os.unlink(template_outputpath)
 					# 	err(summary)
-					# else:
-					#	warn(summary)
+					# else:
+					# 	warn(summary)
 				else:
 					shutil.copy(template_outputpath+".tmp", template_outputpath)
 				os.unlink(template_outputpath+".tmp")
