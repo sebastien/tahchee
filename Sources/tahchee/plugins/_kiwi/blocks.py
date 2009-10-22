@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Encoding: iso-8859-1
-# vim: tw=80 ts=4 sw=4 fenc=latin-1 noet
+# vim: tw=80 ts=4 sw=4 noet
 # -----------------------------------------------------------------------------
 # Project           :   Kiwi
 # Module            :   Block parsers
@@ -9,7 +9,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   02-May-2007
+# Last mod.         :   07-Oct-2009
 # -----------------------------------------------------------------------------
 
 import re, string
@@ -24,6 +24,12 @@ BLOCK_ELEMENTS = ("Block", "ListItem", "Definition", "Content", "Chapter", "Sect
 
 STANDARD_LIST    = 1
 DEFINITION_LIST  = 2
+TODO_LIST        = 3
+ORDERED_LIST     = 4
+
+STANDARD_ITEM    = 100
+TODO_ITEM        = 101
+TODO_DONE_ITEM   = 102
 
 #------------------------------------------------------------------------------
 #
@@ -40,6 +46,8 @@ RE_TITLES         = re.compile(u"%s|%s" % (TITLE, TITLE_HEADER), re.LOCALE|re.MU
 
 SECTION_HEADING   = u"^\s*((([0-9]+|[A-z])\.)+([0-9]+|[A-z])?\.?)"
 RE_SECTION_HEADING= re.compile(SECTION_HEADING, re.LOCALE)
+SECTION_HEADING_ALT = u"^(\=+\s*).+$"
+RE_SECTION_HEADING_ALT= re.compile(SECTION_HEADING_ALT, re.LOCALE)
 SECTION_UNDERLINE = u"^\s*[\*\-\=#][\*\-\=#][\*\-\=#]+\s*$"
 RE_SECTION_UNDERLINE = re.compile(SECTION_UNDERLINE, re.LOCALE|re.MULTILINE)
 
@@ -48,21 +56,19 @@ RE_DEFINITION_ITEM = re.compile(DEFINITION_ITEM, re.LOCALE|re.MULTILINE)
 
 TAGGED_BLOCK      = u"^\s*(([^_]+\s*)(\:[^_]+)?)?(____+)\s*$"
 RE_TAGGED_BLOCK   = re.compile(TAGGED_BLOCK, re.MULTILINE | re.LOCALE)
-LIST_ITEM         = u"^(\s*)(-|\*\)|[0-9A-z][\)/])\s*"
+LIST_ITEM         = u"^(\s*)(-|\*\)|[0-9A-z][\)/]|\[[ \-\~xX]\])\s*"
 RE_LIST_ITEM      = re.compile(LIST_ITEM, re.MULTILINE | re.LOCALE)
 LIST_HEADING      = u"(^\s*[^:{().<]*:)"
 RE_LIST_HEADING   = re.compile(LIST_HEADING, re.MULTILINE | re.LOCALE)
 LIST_ITEM_HEADING = u"^([^:]+(:\s*\n\s*|::\s*))|([^/\\\]+[/\\\]\s*\n\s*)"
 RE_LIST_ITEM_HEADING =  re.compile(LIST_ITEM_HEADING, re.MULTILINE|re.LOCALE)
+RE_NUMBER          = re.compile("\d+[\)\.]")
 
 PREFORMATTED      = u"^(\s*\>(\t|   ))(.*)$"
 RE_PREFORMATTED   = re.compile(PREFORMATTED, re.LOCALE)
 
 CUSTOM_MARKUP = u"\s*-\s*\"([^\"]+)\"\s*[=:]\s*([\w\-_]+)(\s*\(\s*(\w+)\s*\))?"
 RE_CUSTOM_MARKUP = re.compile(CUSTOM_MARKUP, re.LOCALE|re.MULTILINE)
-
-INCLUDE_SIMTEX    = u"\s*\[\s*\$\s*:([^\]]+)\]"
-RE_INCLUDE_SIMTEX = re.compile(INCLUDE_SIMTEX, re.MULTILINE|re.LOCALE)
 
 META_TYPE        = u"\s*(\w+)\s*(\((\w+)\))?"
 RE_META_TYPE     = re.compile(META_TYPE, re.LOCALE|re.MULTILINE)
@@ -74,7 +80,7 @@ RE_META_AUTHOR_EMAIL = re.compile("\<([^>]+)\>", re.LOCALE)
 REFERENCE_ENTRY    = u"\s+\[([^\]]+)]:"
 RE_REFERENCE_ENTRY = re.compile(REFERENCE_ENTRY, re.LOCALE|re.MULTILINE)
 
-TABLE_ROW_SEPARATOR    = "^\s*(-+|=+|\++)\s*$"
+TABLE_ROW_SEPARATOR    = "^\s*([\-\+]+|[\=\+]+)\s*$"
 RE_TABLE_ROW_SEPARATOR = re.compile(TABLE_ROW_SEPARATOR)
 
 LANGUAGE_CODES = ("EN", "FR", "DE", "UK" )
@@ -192,8 +198,8 @@ class ParagraphBlockParser(BlockParser):
 #------------------------------------------------------------------------------
 
 class TaggedBlockParser(BlockParser):
-	"""Parses a paragraph block. This parser always recognised the given block,
-	so it should not appear in the block parsers."""
+	"""Parses a tagged block. Notes are the common example of tagged
+	block."""
 
 	def __init__( self ):
 		BlockParser.__init__(self, "TaggedBlock")
@@ -326,6 +332,7 @@ class TitleBlockParser(BlockParser):
 
 	def recognises( self, context ):
 		matches = []
+		if context.content.childNodes: return None
 		while not context.blockEndReached():
 			match = RE_TITLES.match(context.currentFragment())
 			if match!=None:
@@ -386,11 +393,16 @@ class SectionBlockParser(BlockParser):
 
 	def recognises( self, context ):
 		# We look for the number prefix
-		match = RE_SECTION_HEADING.match(context.currentFragment())
+		match     = RE_SECTION_HEADING.match(context.currentFragment())
 		# We return directly if there are at least two section numbers (2.3)
 		if match:
-			match = RE_SECTION_UNDERLINE.search(context.currentFragment())
-			if match: return (RE_SECTION_HEADING, match)
+			match_underline = RE_SECTION_UNDERLINE.search(context.currentFragment())
+			if match_underline: return (RE_SECTION_UNDERLINE, match_underline)
+			else: return (RE_SECTION_HEADING, match) 
+		# We return directly for a section prefixed by '=='
+		match_alt = RE_SECTION_HEADING_ALT.match(context.currentFragment())
+		if match_alt:
+			return (RE_SECTION_HEADING_ALT, match_alt)
 		# Or a separator followed by blank space
 		match = RE_SECTION_UNDERLINE.search(context.currentFragment())
 		if  match:
@@ -418,53 +430,56 @@ class SectionBlockParser(BlockParser):
 		matched_type, match = recogniseInfo
 		section_indent = context.getBlockIndentation()
 		trail = match.group().strip()
+		# RULE:
+		# A section underlined with '==' weights more than a section
+		# underlined with '--', which weights more than a section 
+		# underline with nothing. This means that if you have
+		#
+		#  1. One
+		#  ======
+		#
+		#  2. Two
+		#  ------
+		#
+		#  3. Three
+		#
+		# These sections will all be children of the previous section
 		section_weight = trail.endswith("==") and 2 or trail.endswith("--") and 1 or 0
+		#
 		# FIRST STEP - We detect section text bounds
-		block_start = context.blockStartOffset
-		block_end = context.blockEndOffset
+		#
+		block_start  = context.blockStartOffset
+		block_end    = context.blockEndOffset
 		section_type = "Section"
 		# We have an underlined section
 		if matched_type == RE_SECTION_UNDERLINE:
 			block_end = context.getOffset() + match.start()
+		if matched_type == RE_SECTION_HEADING_ALT:
+			block_start = context.getOffset() + match.start() + len(match.group(1))
+			block_end   = context.getOffset() + match.end()
+		
 		# We look for a number prefix
 		heading_text = context.fragment(block_start, block_end)
 		prefix_match = RE_SECTION_HEADING.match(heading_text)
+		dots_count   = 0
 		if prefix_match:
-			res  = prefix_match.group()
-			dots = res.count(".")
-			if res.strip()[-1] == "." and dots > 1:
-				dots -= 1
-			section_indent += dots
+			res         = prefix_match.group()
+			dots_count  = len( filter(lambda x:x, res.split(".")) )
 			block_start = context.getOffset() + prefix_match.end()
+		if matched_type == RE_SECTION_HEADING_ALT:
+			dots_count += len(match.group(1))
 		# We make sure that we end the section before the block delimiter
 		delim_match = RE_SECTION_UNDERLINE.search(context.currentFragment())
-		if delim_match: block_end = context.getOffset() + delim_match.start()
-		# SECOND STEP - We look for a parent node, which would have a depth
-		# smaller than the current one or that would not be a section node
-		while context.currentNode != "Content" \
-		and   context.currentNode.parentNode \
-		and   context.currentNode.parentNode.nodeName not in ("Document", "Section"):
-			context.currentNode = context.currentNode.parentNode
-		while context.currentNode.nodeName == "Content" \
-		and context.currentNode.parentNode \
-		and context.currentNode.parentNode.nodeName == "Section" \
-		and context.currentNode.parentNode.parentNode \
-		and int(context.currentNode.parentNode.getAttributeNS(None, "_indent")) - \
-		int(context.currentNode.parentNode.getAttributeNS(None, "_weight")) \
-		>= section_indent - section_weight:
-			context.currentNode = context.currentNode.parentNode.parentNode
-
-		if context.currentNode.parentNode:
-			parent_depth = context.currentNode.parentNode.getAttributeNS(None, "_depth")
-		else:
-			parent_depth = None
-		if not parent_depth: section_depth = 0
-		else: section_depth = int(parent_depth) + 1
-		# THIRD STEP - We create the section
+		if delim_match:
+			block_end = context.getOffset() + delim_match.start()
+		context.currentNode = context.getParentSection(dots_count-section_weight, section_indent)
+		section_depth       = context.getDepthInSection(context.currentNode) + 1
+		#
+		# SECOND STEP - We create the section
+		#
 		section_node = context.document.createElementNS(None, section_type)
 		section_node.setAttributeNS(None, "_indent", str(section_indent ))
 		section_node.setAttributeNS(None, "_depth", str(section_depth))
-		section_node.setAttributeNS(None, "_weight", str(section_weight))
 		section_node.setAttributeNS(None, "_start", str(block_start))
 		section_node.setAttributeNS(None, "_sstart", str(block_start))
 		heading_node = context.document.createElementNS(None, "Heading")
@@ -481,6 +496,7 @@ class SectionBlockParser(BlockParser):
 		# We append the section node and assign it as current node
 		context.currentNode.appendChild(section_node)
 		context.currentNode = content_node
+		context.declareSection(section_node, content_node, dots_count-section_weight)
 
 	def processText( self, context, text ):
 		return context.parser.normaliseText(text.strip())
@@ -612,6 +628,7 @@ class ListItemBlockParser(BlockParser):
 		heading = RE_LIST_ITEM_HEADING.match(current_item_text)
 		heading_offset = 0
 		list_type   = STANDARD_LIST
+		item_type   = STANDARD_ITEM
 		if heading:
 			# We remove the heading from the item text
 			heading_offset = heading.end()
@@ -622,7 +639,19 @@ class ListItemBlockParser(BlockParser):
 			else:
 				list_type = DEFINITION_LIST
 				heading_end = heading.group().rfind("/")
-			
+
+		head = itemMatch.group(2)
+		if head:
+			head = head.upper()
+			if  head == "[ ]":
+				item_type = TODO_ITEM
+				list_type = TODO_LIST
+			elif head == "[X]":
+				item_type = TODO_DONE_ITEM
+				list_type = TODO_LIST
+			elif RE_NUMBER.match(head):
+				list_type = ORDERED_LIST
+
 		# The current_item_text is no longer used in the following code
 
 		# Step 2: Now that we have the item body, and that we know if there is
@@ -661,6 +690,10 @@ class ListItemBlockParser(BlockParser):
 		# We create the list item
 		list_item_node = context.document.createElementNS(None, "ListItem")
 		list_item_node.setAttributeNS(None, "_indent", str(indent))
+		if item_type == TODO_ITEM:
+			list_item_node.setAttributeNS(None, "todo", "true")
+		elif item_type == TODO_DONE_ITEM:
+			list_item_node.setAttributeNS(None, "todo", "done")
 		#list_item_node.setAttributeNS(None, "_start", str(start_offset))
 		if next_item_match:
 			list_item_node.setAttributeNS(None, "_end", str(context.getOffset() + next_item_match.start() -1))
@@ -697,6 +730,10 @@ class ListItemBlockParser(BlockParser):
 		# We set the type attribute of the list if necesseary
 		if list_type == DEFINITION_LIST:
 			list_node.setAttributeNS(None, "type", "definition")
+		elif list_type == TODO_LIST:
+			list_node.setAttributeNS(None, "type", "todo")
+		elif list_type == ORDERED_LIST:
+			list_node.setAttributeNS(None, "type", "ordered")
 
 		# And recurse with other line items
 		if next_item_match:
@@ -724,7 +761,8 @@ class ListItemBlockParser(BlockParser):
 #------------------------------------------------------------------------------
 
 class PreBlockParser( BlockParser ):
-	"""Parses the content of a preformatted block"""
+	"""Parses the content of a preformatted block, where every line is
+	prefixed by '>   '."""
 
 	def __init__( self ):
 		BlockParser.__init__(self, "pre")
@@ -734,7 +772,7 @@ class PreBlockParser( BlockParser ):
 			if line and not RE_PREFORMATTED.match(line):
 				return False
 		return True
-		
+
 	def process( self, context, recogniseInfo ):
 		text = ""
 		for line in context.currentFragment().split("\n"):
@@ -744,6 +782,90 @@ class PreBlockParser( BlockParser ):
 			else:
 				text += line + "\n"
 		if text[-1] == "\n": text = text[:-1]
+		pre_node = context.document.createElementNS(None, self.name)
+		pre_node.appendChild(context.document.createTextNode(text))
+		pre_node.setAttributeNS(None, "_start", str(context.getOffset()))
+		pre_node.setAttributeNS(None, "_end", str(context.blockEndOffset))
+		context.currentNode.appendChild(pre_node)
+
+class PreBlockParser2( BlockParser ):
+	"""Parses the content of a preformatted block which is delimited with
+	'<<<' and '>>>' characters."""
+
+	def __init__( self ):
+		BlockParser.__init__(self, "pre")
+
+	def recognises( self, context ):
+		head_lines =  context.currentFragment().split("\n")
+		if not head_lines: return False
+		if self.isStartLine(context, head_lines[0]):
+			indent = context.parser.getIndentation(head_lines[0])
+			for line in head_lines[1:]:
+				if not line.replace("\t", " ").strip(): continue
+				if context.parser.getIndentation(line) < indent:
+					return False
+		else:
+			return False
+		return True, indent
+
+	def isStartLine( self, context, line ):
+		line_indent = context.parser.getIndentation(line)
+		if line.replace("\t", " ").strip() == "---":
+			return True, line_indent
+		else:
+			return None
+
+	def isEndLine( self, context, line, indent ):
+		line_indent = context.parser.getIndentation(line)
+		if line_indent != indent: return False
+		line = line.replace("\t", " ").strip()
+		return  line == "---"
+
+	def findBlockEnd( self, context, indent ):
+		# FIXME: Issue a warning if no end is found
+		cur_offset = context.blockEndOffset + 1
+		block_end = context.blockEndOffset
+		lines = context.currentFragment().split("\n")
+		if self.isEndLine(context, lines[-1], indent):
+			return block_end
+		while True:
+			next_eol = context.documentText.find("\n", cur_offset)
+			if next_eol == -1:
+				break
+			line = context.documentText[cur_offset:next_eol]
+			if self.isEndLine(context, line, indent):
+				block_end = next_eol + 1
+				break
+			if line.strip() and context.parser.getIndentation(line) < indent:
+				break
+			block_end = next_eol + 1
+			cur_offset = block_end
+		return block_end - 1
+
+	def getCommonPrefix( self, linea, lineb ):
+		if not lineb.replace("\t", " ").strip():
+			return linea
+		else:
+			limit = 0
+			max_limit = min(len(linea), len(lineb))
+			while limit < max_limit and linea[limit] in "\t " and linea[limit] == lineb[limit]:
+				limit += 1
+			assert linea[:limit] == lineb[:limit]
+			return linea[:limit]
+
+	def process( self, context, recogniseInfo ):
+		result = []
+		indent = recogniseInfo[1]
+		context.setCurrentBlockEnd(self.findBlockEnd(context, indent))
+		lines = context.currentFragment().split("\n")
+		lines = lines[1:-1]
+		prefix   = lines[0]
+		for line in lines:
+			prefix = self.getCommonPrefix(prefix, line)
+		for line in lines:
+			line = line[len(prefix):]
+			result.append(line)
+		text = "\n".join(result)
 		pre_node = context.document.createElementNS(None, self.name)
 		pre_node.appendChild(context.document.createTextNode(text))
 		pre_node.setAttributeNS(None, "_start", str(context.getOffset()))
@@ -767,9 +889,13 @@ class Table:
 		self._rows  = 0
 		self._cols  = 0
 		self._title = None
+		self._id    = None
 	
 	def dimension( self ):
 		return len(self._table[0]), len(self._table) 
+
+	def getRow( self, y):
+		return self._table[y]
 
 	def _ensureCell( self, x, y ):
 		"""Ensures that the cell at the given position exists and returns its
@@ -777,13 +903,17 @@ class Table:
 		while y >= len(self._table): self._table.append([])
 		row = self._table[y]
 		while x >= len(row): row.append(["T", None])
-		self._cols = max(self._cols, x)
-		self._rows = max(self._rows, y)
+		self._cols = max(self._cols, x+1)
+		self._rows = max(self._rows, y+1)
 		return row[x]
 		
 	def setTitle( self, title ):
 		"""Sets the title for this table."""
 		self._title = title.strip()
+
+	def setID( self, id ):
+		"""Sets the id for this table."""
+		self._id = id.strip()
 
 	def appendCellContent( self, x, y, text ):
 		cell_type, cell_text = self._ensureCell(x,y)
@@ -800,12 +930,17 @@ class Table:
 
 	def isHeader( self, x, y ):
 		if len(self._table) < y or len(self._table[y]) < x: return False
+		row = self._table[y]
+		if x>=len(row): return False
 		return self._table[y][x][0] == "H"
 
 	def getNode( self, context, processText ):
 		"""Renders the table as a Kiwi XML document node."""
 		table_node   = context.document.createElementNS(None, "Table")
 		content_node = context.document.createElementNS(None, "Content")
+		# We set the id
+		if self._id:
+			table_node.setAttributeNS(None, "id", self._id)
 		# We take care of the title
 		if self._title:
 			caption_node = context.document.createElementNS(None, "Caption")
@@ -815,13 +950,18 @@ class Table:
 		# And now of the table
 		for row in self._table:
 			row_node = context.document.createElementNS(None, "Row")
+			i = 0
 			for cell_type, cell_text in row:
+				is_first = i == 0
+				is_last  = i == len(row) - 1
 				cell_node = context.document.createElementNS(None, "Cell")
 				if cell_type == "H":
 					cell_node.setAttributeNS(None, "type", "header")
 				# We create a temporary Content node that will stop the nodes
 				# from seeking a parent content
 				cell_content_node = context.document.createElementNS(None, "Content")
+				if is_last and len(row) != self._cols:
+					cell_node.setAttributeNS(None, "colspan", "%s" % (len(row) + 2 - i))
 				new_context = context.clone()
 				new_context.setDocumentText(cell_text)
 				new_context.currentNode = cell_content_node
@@ -830,6 +970,7 @@ class Table:
 				for child in cell_content_node.childNodes:
 					cell_node.appendChild(child)
 				row_node.appendChild(cell_node)
+				i += 1
 			content_node.appendChild(row_node)
 		table_node.appendChild(content_node)
 		return table_node
@@ -868,7 +1009,12 @@ class TableBlockParser( BlockParser ):
 		# We take care of the title
 		title_match = RE_TITLE.match(rows[0])
 		if title_match:
-			table.setTitle(title_match.group(2))
+			title_name = title_match.group(2).split("#",1)
+			title_id   = None
+			if len(title_name) == 2:
+				title_name, title_id = title_name
+			table.setTitle(title_name)
+			table.setID(title_id)
 			rows = rows[2:]
 		else:
 			rows = rows[1:]
@@ -882,21 +1028,36 @@ class TableBlockParser( BlockParser ):
 			# If we have not found a separator yet, we simply ensure that the
 			# cell exists and appends content to it
 			if not separator:
+				# If the separtor is not '||' it is '|'
+				if  row.find("||") == -1:
+					row = row.replace("|", "||")
 				for cell in row.split("||"):
 					cells.append(cell)
 					# We remove leading or trailing borders (|)
 					if cell and cell[0]  == "|": cell = cell[1:]
 					if cell and cell[-1] == "|": cell = cell[:-1]
 					table.appendCellContent(x,y,cell)
+					# FIXME: Weird rule
 					# The default cell type is the same as the above
 					# cell, if any.
-					if y>0 and table.isHeader(x,y-1):
-						table.headerCell(x,y)
+					#if y>0 and table.isHeader(x,y-1):
+					#	table.headerCell(x,y)
 					x += 1
 			# We move to the next row only when we encounter a separator. The
 			# analysis of the separtor will tell you if the above cell is a
 			# header or a data cell
 			else:
+				# FIXME: This is wrong, see below
+				if separator.group(1)[0] == "=":
+					row_count = table.dimension()[1]
+					if row_count > 0:
+						for cell in table.getRow(row_count - 1):
+							cell[0] = "H"
+				if separator.group(1)[0] == "-":
+					row_count = table.dimension()[1]
+					if row_count > 0:
+						for cell in table.getRow(row_count - 1):
+							cell[0] = "T"
 				# FIXME: Should handle vertical tables also
 				# ==================================
 				# HEADER || DATA
@@ -904,7 +1065,9 @@ class TableBlockParser( BlockParser ):
 				# ....
 				offset = 0
 				x      = 0
+				# FIXME: Here cells is always empty
 				for cell in cells:
+					assert None, "Should not be here"
 					if separator.group(1)[offset] == "=": table.headerCell(x,y)
 					else: table.dataCell(x,y)
 					offset += len(cell)
@@ -917,7 +1080,6 @@ class TableBlockParser( BlockParser ):
 #  MetaBlockParser
 #
 #------------------------------------------------------------------------------
-
 
 class MetaBlockParser( BlockParser ):
 	"""Parses the content of a Meta block"""

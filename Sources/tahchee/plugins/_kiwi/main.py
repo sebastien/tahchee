@@ -8,7 +8,7 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Creation date     :   19-Nov-2003
-# Last mod.         :   07-May-2007
+# Last mod.         :   26-Jul-2008
 # -----------------------------------------------------------------------------
 
 import os, sys, StringIO
@@ -17,7 +17,7 @@ __doc__ = """Kiwi is an advanced markup text processor, which can be used as
 an embedded processor in any application. It is fast, extensible and outputs an
 XML DOM."""
 
-__version__ = "0.8.2"
+__version__ = "0.8.6"
 __pychecker__ = "blacklist=cDomlette,cDomlettec"
 
 import re, string, operator, getopt, codecs
@@ -30,7 +30,13 @@ import re, string, operator, getopt, codecs
 import xml.dom.minidom
 dom = xml.dom.minidom.getDOMImplementation()
 
-import core, kiwi2html
+import core, kiwi2html, kiwi2lout, kiwi2twiki
+
+FORMATS = {
+	"html":kiwi2html,
+#	"lout":kiwi2lout,
+	"twiki":kiwi2twiki
+}
 
 #------------------------------------------------------------------------------
 #
@@ -66,9 +72,12 @@ Options:
       --no-style                 Does not include the default CSS in the HTML
       --body-only                Only returns the content of the <body< element
       --level=n                  If n>0, n will transform HTML h1 to h2, etc...
-
-   The available encodings are %s
-
+   -O --output-format            Specifies and alternate output FORMAT
+                                 (see below)
+								 
+   The available encodings are   %s
+   The available formats are     %s
+   
 Misc:
    -h,  --help                    prints this help.
    -v,  --version                 prints the version of Kiwi.
@@ -102,8 +111,8 @@ ENCODINGS = {
 	UTF16:UTF16, "utf16":UTF16,
 	MACROMAN:MACROMAN, "mac-roman":MACROMAN
 }
-	
-def run( arguments, input = None, noOutput=False ):
+
+def run( arguments, input=None, noOutput=False ):
 	"""Returns a couple (STATUS, VALUE), where status is 1 when OK, 0 when
 	informative, and -1 when error, and value is a string.
 	
@@ -116,9 +125,10 @@ def run( arguments, input = None, noOutput=False ):
 
 	# --We extract the arguments
 	try:
-		optlist, args = getopt.getopt(arguments, "hpmfvi:o:t:",\
-		["input-encoding=", "output-encoding=", "offsets", "help", "html",
-		"tab=", "version", "pretty", "no-style", "nostyle",
+		optlist, args = getopt.getopt(arguments, "hpmfO:vi:o:t:",\
+		["input-encoding=", "output-encoding=", "output-format=",
+		"offsets", "help", "html", "tab=", "version",
+		"pretty", "no-style", "nostyle",
 		"body-only", "bodyonly", "level="])
 	except:
 		args=[]
@@ -136,7 +146,7 @@ def run( arguments, input = None, noOutput=False ):
 			pass
 	ENCODINGS_LIST=ENCODINGS_LIST[:-2]+"."
 
-	usage = USAGE % (ENCODINGS_LIST)
+	usage = USAGE % (ENCODINGS_LIST, ", ".join(FORMATS.keys()))
 
 	# We set attributes
 	pretty_print    = 0
@@ -148,6 +158,7 @@ def run( arguments, input = None, noOutput=False ):
 	level_offset    = 0
 	input_enc       = ASCII
 	output_enc      = ASCII
+	output_format   = "html"
 	if LATIN1 in ENCODINGS:
 		input_enc  = LATIN1
 		output_enc = LATIN1
@@ -164,7 +175,7 @@ def run( arguments, input = None, noOutput=False ):
 		elif opt in ('-i', '--input-encoding'):
 			arg = string.lower(arg)
 			if arg in ENCODINGS.keys() and ENCODINGS[arg] in available_enc:
-				input_enc=ENCODINGS[arg]
+				input_enc=output_enc=ENCODINGS[arg]
 			else:
 				r  = "Kiwi error : Specified input encoding is not available, choose between:"
 				r += ENCODINGS_LIST
@@ -176,6 +187,14 @@ def run( arguments, input = None, noOutput=False ):
 			else:
 				r  = "Kiwi error: Specified output encoding is not available, choose between:"
 				r += ENCODINGS_LIST
+				return (ERROR, r)
+		elif opt in ('-O', '--output-format'):
+			arg = string.lower(arg)
+			if arg in FORMATS.keys():
+				output_format=arg
+			else:
+				r  = "Kiwi error: Given format (%s) not supported. Choose one of:\n" % (arg)
+				r += "\n  - ".join(FORMATS)
 				return (ERROR, r)
 		elif opt in ('-t', '--tab'):
 			TAB_SIZE = int(arg)
@@ -196,6 +215,7 @@ def run( arguments, input = None, noOutput=False ):
 			generate_html = 0
 		elif opt in ('-m', '--html'):
 			generate_html = 1
+			output_format = "html"
 			pretty_print  = 0
 		elif opt in ('-f', '--offsets'):
 			show_offsets = True
@@ -232,7 +252,7 @@ def run( arguments, input = None, noOutput=False ):
 		try:
 			ifile = codecs.open(source,"r",input_enc)
 		except:
-			return (ERROR, "Unable to open input file.")
+			return (ERROR, "Unable to open input file: %s" % (input))
 
 	if noOutput: pass
 	elif output==None: ofile = sys.stdout
@@ -260,7 +280,7 @@ def run( arguments, input = None, noOutput=False ):
 			variables["HEADER"] = "\n<style><!-- \n%s --></style>" % (css_file.read())
 			variables["ENCODING"] = output_enc
 		css_file.close()
-		result = kiwi2html.processor.generate(xml_document, body_only, variables)
+		result = FORMATS[output_format].processor.generate(xml_document, body_only, variables)
 		if result: result = result.encode(output_enc)
 		else: result = ""
 		if not noOutput: ofile.write(result)
@@ -286,11 +306,16 @@ def text2htmlbody( text, inputEncoding=None, outputEncoding=None ):
 	s.close()
 	return text
 
-if __name__ == "__main__":
+def runAsCommand():
 	status, result = run(sys.argv[1:])
 	if status == ERROR:
 		sys.stderr.write(result + "\n")
+		sys.exit(-1)
 	elif status == INFO:
 		sys.stdout.write(result + "\n")
+		sys.exit(0)
+
+if __name__ == "__main__":
+	runAsCommand()
 
 # EOF

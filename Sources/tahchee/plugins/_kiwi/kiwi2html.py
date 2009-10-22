@@ -7,7 +7,7 @@
 # Author            :   Sebastien Pierre                 <sebastien@type-z.org>
 # -----------------------------------------------------------------------------
 # Creation date     :   07-Feb-2006
-# Last mod.         :   02-Apr-2006
+# Last mod.         :   07-Oct-2009
 # -----------------------------------------------------------------------------
 
 import re, xml.dom
@@ -87,7 +87,7 @@ def wdiv( element, text ):
 	given element has offset attributes."""
 	number = element_number(element)
 	if number == None: return text
-	return "<div id='KIWI%s' start='%s' end='%s'>%s</div>" % (
+	return "<div class='KIWI N%s' ostart='%s' oend='%s'>%s</div>" % (
 		element.getAttributeNS(None, '_number'),
 		element.getAttributeNS(None, '_start'),
 		element.getAttributeNS(None, '_end'),
@@ -99,7 +99,7 @@ def wspan( element, text ):
 	given element has offset attributes."""
 	number = element_number(element)
 	if number == None: return text
-	return "<div id='KIWI%s' start='%s' end='%s'>%s</div>" % (
+	return "<div class='KIWI N%s' ostart='%s' oend='%s'>%s</div>" % (
 		element.getAttributeNS(None, '_number'),
 		element.getAttributeNS(None, '_start'),
 		element.getAttributeNS(None, '_end'),
@@ -108,13 +108,15 @@ def wspan( element, text ):
 
 def wattrs( element ):
 	"""Returns the offset attributes of this element if it has any."""
+	res = ""
 	number = element_number(element)
-	if number == None: return ""
-	return " id='KIWI%s' start='%s' end='%s'" % (
-		element.getAttributeNS(None, '_number'),
-		element.getAttributeNS(None, '_start'),
-		element.getAttributeNS(None, '_end')
-	)
+	if number != None:
+		res = " class='KIWI N%s' ostart='%s' oend='%s'" % (
+			element.getAttributeNS(None, '_number'),
+			element.getAttributeNS(None, '_start'),
+			element.getAttributeNS(None, '_end')
+		)
+	return res
 
 def convertContent( element ):
 	return process(element, wdiv(element, """<div class='content'>$(*)</div>"""))
@@ -131,17 +133,47 @@ def convertHeader( element ):
 def convertHeading( element ):
 	return process(element, wspan(element, "$(*)"))
 
+def getSectionNumberPrefix(element):
+	if not element:
+		return ""
+	if not element.nodeName in ("Chapter", "Section"):
+		return ""
+	parent = element.parentNode
+	section_count = 1
+	for child in parent.childNodes:
+		if child == element:
+			break
+		if child.nodeName in ("Chapter", "Section"):
+			section_count += 1
+	parent_number = getSectionNumberPrefix(parent.parentNode)
+	if parent_number:
+		return "%s.%s" % (parent_number, section_count)
+	else:
+		return str(section_count)
+
+def formatSectionNumber(number):
+	number = str(number).split(".")
+	depth = 0
+	res   = []
+	for n in number:
+		if depth == len(number) - 1:
+			res.append('<span class="level%s">%s<span class="lastDot dot">.</span></span>' % (depth,n))
+		else:
+			res.append('<span class="level%s">%s<span class="dot">.</span></span>' % (depth,n))
+		depth += 1
+	return "".join(res)
+
 def convertSection( element ):
 	offset = element._processor.variables.get("LEVEL") or 0
-	level = int(element.getAttributeNS(None, "_depth")) + 1 + offset
+	level = int(element.getAttributeNS(None, "_depth")) + offset
 	return process(element,
-	  '<div class="section">'
-	  + '<h%d class="heading">$(Heading)</h%d>' % (level, level)
+	  '<div class="section" level="%d">' % (level)
+	  + '<h%d class="heading"><span class="number">%s</span>$(Heading)</h%d>' % (level, formatSectionNumber(getSectionNumberPrefix(element)), level)
 	  + '<div class="level%d">$(Content:section)</div></div>' % (level)
 	)
 
 def convertReferences( element ):
-	return process(element, """<div class="wikiReferences">$(Entry)</div>""")
+	return process(element, """<div class="kiwiReferences">$(Entry)</div>""")
 
 def convertEntry( element ):
 	return process(element, """<div class="entry"><div class="name"><a name="%s">%s</a></div><div class="content">$(*)</div></div>""" %
@@ -164,13 +196,33 @@ def convertParagraph_cell( element ):
 	return process(element, """$(*)<br />""")
 
 def convertList( element ):
-	return process(element, """<ul%s>$(*)</ul>""" % (wattrs(element)))
+	list_type = element.getAttributeNS(None, "type")
+	attrs = [""]
+	if list_type:
+		attrs.append('class="%s"' % (list_type))
+	if list_type == "ordered":
+		return process(element, """<ol%s%s>$(*)</ul>""" % (wattrs(element), " ".join(attrs)))
+	else:
+		return process(element, """<ul%s%s>$(*)</ul>""" % (wattrs(element), " ".join(attrs)))
 
 def convertListItem( element ):
-	return process(element, """<li%s>$(*)</li>""" % (wattrs(element)))
+	attrs   = [""]
+	is_todo = element.getAttributeNS(None, "todo")
+	if is_todo:
+		if is_todo == "done":
+			attrs.append('class="todo done"')
+			return process(element, """<li%s%s><input type='checkbox' checked='true' readonly>$(*)</input></li>""" % (wattrs(element), " ".join(attrs)))
+		else:
+			attrs.append('class="todo"')
+			return process(element, """<li%s%s><input type='checkbox' readonly>$(*)</input></li>""" % (wattrs(element), " ".join(attrs)))
+	else:
+		return process(element, """<li%s%s>$(*)</li>""" % (wattrs(element), " ".join(attrs)))
 
 def convertTable( element ):
-	return process(element, """<table cellpadding="0" cellspacing="0" align="center">$(Caption)$(Content:table)</table>""")
+	tid = element.getAttributeNS(None, "id")
+	if tid: tid = ' id="%s"' % (tid)
+	else:   tid = ""
+	return process(element, """<div class="table"%s><table cellpadding="0" cellspacing="0" align="center">$(Caption)$(Content:table)</table></div>""" % (tid))
 
 def convertDefinition( element ):
 	return process(element, """<dl%s>$(*)</dl>""" % (wattrs(element)))
@@ -188,27 +240,41 @@ def convertRow( element ):
 	return process(element, """<tr class='%s'%s>$(*)</tr>""" % (classes[index], wattrs(element)))
 
 def convertCell( element ):
-	return process(element, """<td%s>$(*:cell)</td>""" % (wattrs(element)))
+	cell_attrs = ""
+	node_type  = element.getAttributeNS(None, "type")
+	if element.hasAttributeNS(None, "colspan"):
+		cell_attrs += " colspan='%s'" % (element.getAttributeNS(None, "colspan"))
+	if node_type == "header":
+		return process(element, """<th%s%s>$(*:cell)</th>""" % (cell_attrs,wattrs(element)))
+	else:
+		return process(element, """<td%s%s>$(*:cell)</td>""" % (cell_attrs,wattrs(element)))
 
 def convertBlock( element ):
 	title = element.getAttributeNS(None,"title") or element.getAttributeNS(None, "type") or ""
 	css_class = ""
 	if title:
 		css_class=" class='ann%s'" % (element.getAttributeNS(None, "type").capitalize())
-		title = "<div class='title'>%s</div>"  % (title.capitalize())
+		title = "<div class='title'>%s</div>"  % (title)
 		div_type = "div"
 	elif not element.getAttributeNS(None, "type"):
 		div_type = "blockquote"
 	return process(element, """<%s%s>%s<div class='content'%s>$(*)</div></%s>""" % (div_type, css_class, title, wattrs(element), div_type))
 
+def stringToTarget( text ):
+	return text.replace("  ", " ").strip().replace(" ", "_")
+
 def convertlink( element ):
 	if element.getAttributeNS(None, "type") == "ref":
-		return process(element, """<a href="#%s">$(*)</a>""" %
-		(element.getAttributeNS(None, "target")))
+		return process(element, """<a href="#%s" class="internal">$(*)</a>""" %
+		(stringToTarget(element.getAttributeNS(None, "target"))))
 	else:
 		# TODO: Support title
-		return process(element, """<a href="%s">$(*)</a>""" %
+		return process(element, """<a href="%s" class="external">$(*)</a>""" %
 		(element.getAttributeNS(None, "target")))
+
+def converttarget( element ):
+	name = element.getAttributeNS(None, "name")
+	return process(element, """<a class="anchor" name="%s">$(*)</a>""" % (stringToTarget(name)))
 
 def convertMeta( element ):
 	return process(element, "<table class='kiwiMeta'>$(*)</table>")
@@ -225,7 +291,7 @@ def convertemail( element ):
 	return """<a href="mailto:%s">%s</a>""" % (mail, mail)
 
 def converturl( element ):
-	return process(element, """<a href="$(*)">$(*)</a>""")
+	return process(element, """<a href="$(*)" target="_blank">$(*)</a>""")
 
 def converturl_header( element ):
 	return process(element, """<div class='url'>%s</div>""" % (

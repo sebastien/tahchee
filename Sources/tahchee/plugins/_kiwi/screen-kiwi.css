@@ -4,16 +4,12 @@ body {
 	padding: 20pt;
 	padding-top: 10pt;
 	background: rgb(255,255,255);
-	font:  10.5pt/15pt sans-serif;
+	font:  10.5pt/15pt "Helvetica",Helvetica,sans-serif;
 	color: rgb(80,80,80);
 }
 
-table tr td {
-	font:  8pt/12pt "Lucida Grande",Lucida,sans-serif;
-}
-
 h1, h2, h3, h4 {
-	font-family: "Trebuchet MS",sans-serif;
+	font-family: "Trebuchet MS",Helvetica,sans-serif;
 	color: rgb(22, 130, 178);
 	font-weight: normal;
 	padding-top: 0.5em;
@@ -75,7 +71,7 @@ aimg {
 }
 
 .kiwiMeta {
-	width: 100%;
+	max-width: 700px;
 	padding: 5pt;
 	margin-bottom:  2em;
 	border-top:  1px solid rgb(150, 220, 238);
@@ -90,24 +86,42 @@ aimg {
 	font-weight: bold;
 }
 
-.kiwiContent h1, .kiwiContent h2{
-	padding-bottom: 5pt;
-	border-bottom:  1px dotted rgb(150, 220, 238);
+.kiwiContent {
+	max-width: 700px;
+}
+
+.kiwiContent .heading .number {
+	display: none;
+	padding-right: 8pt;
+}
+
+.kiwiContent .heading .number .lastDot {
+	display: none;
+}
+
+
+.kiwiContent .heading .number .level0 .lastDot {
+	display: inline;
 }
 
 .kiwiContent h1 {
-	font-size: 1.5em;
-	font-weight: normal;
-	padding-top: 1.5em;
+	font-size: 1.8em;
+	font-weight: bold;
+	margin-top: 1.5em;
 	padding-bottom: 0.5em;
+	border-bottom:  1px dotted rgb(150, 220, 238);
 }
 
 .kiwiContent h2 {
-	font-size: 1.3em;
+	font-size: 1.4em;
+	font-weight: bold;
+	padding-bottom: 0.5em;
+	border-bottom:  1px dotted rgb(150, 220, 238);
 }
 
 .kiwiContent h3 {
-	font-size: 1.1em;
+	font-size: 1.2em;
+	font-weight: normal;
 }
 
 .kiwiContent pre {
@@ -136,16 +150,28 @@ aimg {
 }
 
 .kiwiContent dd pre {
-	border-left: 0px;
+}
+
+.kiwiContent ul {
+	padding-top: 0em;
+	margin-top: 0em;
 }
 
 .kiwiContent ul li {
-	padding-bottom: 0.5em;
+	padding-bottom: 0.2em;
+}
+
+.kiwiContent ul li.todo {
+	list-style-type: square;
+}
+
+.kiwiContent ul li.todo.done {
+	text-decoration: line-through;
 }
 
 .kiwiContent table {
 	border:  1px solid rgb(150, 220, 238);
-	padding: 5pt;
+	padding: 0pt;
 }
 
 .kiwiContent table caption {
@@ -166,9 +192,24 @@ aimg {
 
 .kiwiContent table tr td {
 	margin: 0;
-	padding: 0px;
-	padding-right: 5pt;
+	padding: 5pt;
+	font-size: 90%;
+	min-width: 125px;
 	background-color: rgb(250,250,250);
+	border-bottom: 1px solid rgb(150, 220, 238);
+}
+
+.kiwiContent table tr td.lastRow {
+	border-bottom: none;
+}
+
+.kiwiContent table tr td.lastCol {
+	border-right: none;
+}
+
+.kiwiContent table tr.even td {
+	background-color: #FEFEFE;
+
 }
 
 .kiwiContent table tr.odd td {
@@ -222,7 +263,7 @@ aimg {
 	font:  8pt/12pt "Lucida Grande",Lucida,sans-serif;
 	margin-top: 10pt;
 	padding: 5pt;
-	border-top:  1px solid rgb(150, 220, 238);
+	border-top:  1px solid rgb(200, 200, 200);
 	background-color: rgb(250,250,250);
 	color: rgb(200, 200, 200);
 	font-size: 8pt;
