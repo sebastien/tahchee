@@ -112,7 +112,7 @@ class ImagingPlugin:
 		del draw
 		output_path = self.pages() + "/" + folder
 		if not os.path.exists(output_path): os.makedirs(output_path)
-		sig = sha.new(text + fontName + str(fontSize) + str(color))
+		sig = hashfunc.new(text + fontName + str(fontSize) + str(color))
 		f = open(output_path + "/" + sig.hexdigest() + ".png", "w")
 		image.save(f, "PNG")
 		f.close()

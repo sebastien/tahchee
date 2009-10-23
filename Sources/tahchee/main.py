@@ -20,7 +20,12 @@ __version__ = "0.9.9"
 
 def version(): return __version__
 
-import os, sys, time, shutil, stat, pickle, sha, glob, fnmatch, re, StringIO, webbrowser
+import os, sys, time, shutil, stat, pickle, glob, fnmatch, re, StringIO, webbrowser
+
+try:
+	import hashlib.sha1 as hashfunc
+except ImportError:
+	import sha as hashfunc
 
 try:
 	import Cheetah
@@ -412,7 +417,7 @@ class Site:
 		"""Returns this site signature as a string. The signature uniquely
 		identifies this site. Each instance has a different signature."""
 		sig =  self.pages() + self.output() + self.templatesDir
-		return sha.new(sig).hexdigest()
+		return hashfunc.new(sig).hexdigest()
 
 	def absolutePath( self, path="" ):
 		"""Returns the absolute normalized path for the given path, which must
@@ -514,7 +519,7 @@ class SiteBuilder:
 					template_has_changed = True
 		# There is a SHA1 mode for real checksum change detection
 		if self.site.changeDetectionMethod() == CHANGE_CHECKSUM:
-			chksum = sha.new(data or load_data(path)).hexdigest()
+			chksum = hashfunc.new(data or load_data(path)).hexdigest()
 		# Default is modification time (faster)
 		else:
 			if os.path.exists(path):
