@@ -56,7 +56,7 @@ class LinkingPlugin:
 			)
 
 		# We add the last link ofr the file
-		radix = os.path.splitext(page)
+		radix = os.path.splitext(page)[0]
 		if radix!="index":
 			return res+"<a href='%s'>%s</a> " % (
 				self.link(pagePath, radix), radix
