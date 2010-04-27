@@ -8,23 +8,24 @@
 # License           :   Revised BSD License
 # -----------------------------------------------------------------------------
 # Contibutors       :   Rafael Villar Burke                 <pachi@rvburke.com>
+#                       Juan Fiol
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   11-Sep-2009
+# Last mod.         :   27-Apr-2010
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.4, Cheetah
 # Recommends: PIL, HTML Tidy
 
-__version__ = "0.9.9"
+__version__ = "1.0.0"
 
 def version(): return __version__
 
 import os, sys, time, shutil, stat, pickle, glob, fnmatch, re, StringIO, webbrowser
 
 try:
-	import hashlib.sha1 as hashfunc
-except ImportError:
+	from hashlib import sha1 as hashfunc
+except ImportError,e:
 	import sha as hashfunc
 
 try:
@@ -33,8 +34,8 @@ try:
 	from Cheetah.Compiler import Compiler
 	from Cheetah.Version import Version
 	if Version.count(".") == 3:
-		vmaj, vmin, vdev = map(int, Version.split("."))
-		if vmin <= 9: assert vdev >= 17
+		cheeta_ver = map(int, Version.split("."))
+		if cheeta_ver[0]==0 and cheeta_ver[1] <= 9: assert cheeta_ver[2] >= 17
 except:
 	print "Cheetah 0.9.17+ is required. See <http://www.cheetahtemplate.org>"
 	sys.exit()
