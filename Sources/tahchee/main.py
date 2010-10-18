@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # Encoding: ISO-8859-1
-# vim: tw=80 ts=4 sw=4 noet
 # -----------------------------------------------------------------------------
 # Project           :   Tahchee                     <http://www.ivy.fr/tahchee>
 # -----------------------------------------------------------------------------
@@ -11,13 +10,13 @@
 #                       Juan Fiol
 # -----------------------------------------------------------------------------
 # Creation date     :   20-Mar-2005
-# Last mod.         :   27-Apr-2010
+# Last mod.         :   18-Oct-2010
 # -----------------------------------------------------------------------------
 
 # Requires: Python 2.4, Cheetah
 # Recommends: PIL, HTML Tidy
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 def version(): return __version__
 
@@ -418,7 +417,9 @@ class Site:
 		"""Returns this site signature as a string. The signature uniquely
 		identifies this site. Each instance has a different signature."""
 		sig =  self.pages() + self.output() + self.templatesDir
-		return hashfunc.new(sig).hexdigest()
+		try:      s=hashfunc.new(sig).hexdigest()
+		except:   s=hashfunc(sig).hexdigest()
+		return s
 
 	def absolutePath( self, path="" ):
 		"""Returns the absolute normalized path for the given path, which must
@@ -520,7 +521,10 @@ class SiteBuilder:
 					template_has_changed = True
 		# There is a SHA1 mode for real checksum change detection
 		if self.site.changeDetectionMethod() == CHANGE_CHECKSUM:
-			chksum = hashfunc.new(data or load_data(path)).hexdigest()
+			try:															# sha1
+				chksum = hashfunc.new(data or load_data(path)).hexdigest()
+			except:
+				chksum = hashfunc(data or load_data(path)).hexdigest() # hashlib
 		# Default is modification time (faster)
 		else:
 			if os.path.exists(path):
@@ -1167,4 +1171,4 @@ if __name__ == "__main__":
 	args = sys.argv[1:]
 	run(args)
 
-# EOF
+# EOF - vim: tw=80 ts=4 sw=4 noet
